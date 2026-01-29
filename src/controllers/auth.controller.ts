@@ -7,6 +7,7 @@ import {
   findUserByEmail,
   findUserById,
   generateResetToken,
+  getUserId,
   resetPassword,
   setResetPasswordToken,
   signAccessToken,
@@ -29,7 +30,7 @@ export async function signup(req: Request, res: Response) {
   if (existing) throw httpError(409, 'EMAIL_IN_USE', 'Email already registered')
 
   const user = await createUser({ fullName, email, password })
-  const accessToken = signAccessToken(user._id.toString())
+  const accessToken = signAccessToken(getUserId(user))
 
   res.status(201).json({ user: toPublicUser(user), accessToken })
 }
@@ -47,7 +48,7 @@ export async function login(req: Request, res: Response) {
   const ok = await verifyPassword(password, user.passwordHash)
   if (!ok) throw httpError(401, 'INVALID_CREDENTIALS', 'Invalid credentials')
 
-  const accessToken = signAccessToken(user._id.toString())
+  const accessToken = signAccessToken(getUserId(user))
   res.json({ user: toPublicUser(user), accessToken })
 }
 
@@ -77,7 +78,7 @@ export async function forgotPassword(req: Request, res: Response) {
 
   const resetToken = generateResetToken()
   const expiresAt = new Date(Date.now() + 15 * 60 * 1000) // 15 minutos
-  await setResetPasswordToken(user._id.toString(), resetToken, expiresAt)
+  await setResetPasswordToken(getUserId(user), resetToken, expiresAt)
 
   // Modo dev: se devuelve el token para que el frontend lo use.
   res.json({ resetToken, expiresAt: expiresAt.toISOString() })
@@ -104,7 +105,7 @@ export async function resetPasswordWithToken(req: Request, res: Response) {
   const user = await findUserByValidResetToken(token)
   if (!user) throw httpError(400, 'INVALID_TOKEN', 'Token is invalid or expired')
 
-  await resetPassword(user._id.toString(), password)
+  await resetPassword(getUserId(user), password)
   res.json({ ok: true })
 }
 

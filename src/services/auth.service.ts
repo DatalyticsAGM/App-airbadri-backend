@@ -1,18 +1,34 @@
 import bcrypt from 'bcryptjs'
 import crypto from 'crypto'
 import jwt, { type SignOptions } from 'jsonwebtoken'
+import mongoose from 'mongoose'
 
 import { env } from '../config/env'
 import { User, type UserDoc } from '../models/User'
+import {
+  memoryCreateUser,
+  memoryFindUserByEmail,
+  memoryFindUserById,
+  memoryFindUserByValidResetToken,
+  memoryResetPassword,
+  memorySetResetPasswordToken,
+  type MemoryUser,
+} from '../store/memoryUsers'
 
 export type PublicUser = { id: string; fullName: string; email: string }
 
-export function toPublicUser(user: UserDoc): PublicUser {
-  return {
-    id: user._id.toString(),
-    fullName: user.fullName,
-    email: user.email,
-  }
+type StoredUser = UserDoc | MemoryUser
+
+function isDbReady() {
+  return mongoose.connection.readyState === 1
+}
+
+export function getUserId(user: StoredUser) {
+  return '_id' in user ? user._id.toString() : user.id
+}
+
+export function toPublicUser(user: StoredUser): PublicUser {
+  return { id: getUserId(user), fullName: user.fullName, email: user.email }
 }
 
 export async function hashPassword(password: string) {
@@ -41,23 +57,35 @@ export function generateResetToken() {
 
 export async function createUser(params: { fullName: string; email: string; password: string }) {
   const passwordHash = await hashPassword(params.password)
-  const user = await User.create({
+
+  if (!isDbReady()) {
+    return memoryCreateUser({
+      fullName: params.fullName,
+      email: params.email.toLowerCase(),
+      passwordHash,
+    })
+  }
+
+  return User.create({
     fullName: params.fullName,
     email: params.email.toLowerCase(),
     passwordHash,
   })
-  return user
 }
 
 export async function findUserByEmail(email: string) {
+  if (!isDbReady()) return memoryFindUserByEmail(email)
   return User.findOne({ email: email.toLowerCase() })
 }
 
 export async function findUserById(id: string) {
+  if (!isDbReady()) return memoryFindUserById(id)
   return User.findById(id)
 }
 
 export async function setResetPasswordToken(userId: string, token: string, expiresAt: Date) {
+  if (!isDbReady()) return memorySetResetPasswordToken(userId, token, expiresAt)
+
   await User.updateOne(
     { _id: userId },
     { $set: { resetPasswordTokenHash: sha256(token), resetPasswordExpiresAt: expiresAt } }
@@ -65,6 +93,8 @@ export async function setResetPasswordToken(userId: string, token: string, expir
 }
 
 export async function findUserByValidResetToken(token: string) {
+  if (!isDbReady()) return memoryFindUserByValidResetToken(token)
+
   const now = new Date()
   return User.findOne({
     resetPasswordTokenHash: sha256(token),
@@ -74,6 +104,9 @@ export async function findUserByValidResetToken(token: string) {
 
 export async function resetPassword(userId: string, newPassword: string) {
   const passwordHash = await hashPassword(newPassword)
+
+  if (!isDbReady()) return memoryResetPassword(userId, passwordHash)
+
   await User.updateOne(
     { _id: userId },
     {

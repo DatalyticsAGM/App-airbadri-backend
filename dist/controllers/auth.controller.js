@@ -24,7 +24,7 @@ async function signup(req, res) {
     if (existing)
         throw (0, errorHandler_1.httpError)(409, 'EMAIL_IN_USE', 'Email already registered');
     const user = await (0, auth_service_1.createUser)({ fullName, email, password });
-    const accessToken = (0, auth_service_1.signAccessToken)(user._id.toString());
+    const accessToken = (0, auth_service_1.signAccessToken)((0, auth_service_1.getUserId)(user));
     res.status(201).json({ user: (0, auth_service_1.toPublicUser)(user), accessToken });
 }
 async function login(req, res) {
@@ -40,7 +40,7 @@ async function login(req, res) {
     const ok = await (0, auth_service_1.verifyPassword)(password, user.passwordHash);
     if (!ok)
         throw (0, errorHandler_1.httpError)(401, 'INVALID_CREDENTIALS', 'Invalid credentials');
-    const accessToken = (0, auth_service_1.signAccessToken)(user._id.toString());
+    const accessToken = (0, auth_service_1.signAccessToken)((0, auth_service_1.getUserId)(user));
     res.json({ user: (0, auth_service_1.toPublicUser)(user), accessToken });
 }
 async function me(req, res) {
@@ -66,7 +66,7 @@ async function forgotPassword(req, res) {
         return res.json({ ok: true });
     const resetToken = (0, auth_service_1.generateResetToken)();
     const expiresAt = new Date(Date.now() + 15 * 60 * 1000); // 15 minutos
-    await (0, auth_service_1.setResetPasswordToken)(user._id.toString(), resetToken, expiresAt);
+    await (0, auth_service_1.setResetPasswordToken)((0, auth_service_1.getUserId)(user), resetToken, expiresAt);
     // Modo dev: se devuelve el token para que el frontend lo use.
     res.json({ resetToken, expiresAt: expiresAt.toISOString() });
 }
@@ -89,7 +89,7 @@ async function resetPasswordWithToken(req, res) {
     const user = await (0, auth_service_1.findUserByValidResetToken)(token);
     if (!user)
         throw (0, errorHandler_1.httpError)(400, 'INVALID_TOKEN', 'Token is invalid or expired');
-    await (0, auth_service_1.resetPassword)(user._id.toString(), password);
+    await (0, auth_service_1.resetPassword)((0, auth_service_1.getUserId)(user), password);
     res.json({ ok: true });
 }
 //# sourceMappingURL=auth.controller.js.map

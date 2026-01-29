@@ -3,6 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.getUserId = getUserId;
 exports.toPublicUser = toPublicUser;
 exports.hashPassword = hashPassword;
 exports.verifyPassword = verifyPassword;
@@ -18,14 +19,18 @@ exports.resetPassword = resetPassword;
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const crypto_1 = __importDefault(require("crypto"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const mongoose_1 = __importDefault(require("mongoose"));
 const env_1 = require("../config/env");
 const User_1 = require("../models/User");
+const memoryUsers_1 = require("../store/memoryUsers");
+function isDbReady() {
+    return mongoose_1.default.connection.readyState === 1;
+}
+function getUserId(user) {
+    return '_id' in user ? user._id.toString() : user.id;
+}
 function toPublicUser(user) {
-    return {
-        id: user._id.toString(),
-        fullName: user.fullName,
-        email: user.email,
-    };
+    return { id: getUserId(user), fullName: user.fullName, email: user.email };
 }
 async function hashPassword(password) {
     const saltRounds = 10;
@@ -48,23 +53,37 @@ function generateResetToken() {
 }
 async function createUser(params) {
     const passwordHash = await hashPassword(params.password);
-    const user = await User_1.User.create({
+    if (!isDbReady()) {
+        return (0, memoryUsers_1.memoryCreateUser)({
+            fullName: params.fullName,
+            email: params.email.toLowerCase(),
+            passwordHash,
+        });
+    }
+    return User_1.User.create({
         fullName: params.fullName,
         email: params.email.toLowerCase(),
         passwordHash,
     });
-    return user;
 }
 async function findUserByEmail(email) {
+    if (!isDbReady())
+        return (0, memoryUsers_1.memoryFindUserByEmail)(email);
     return User_1.User.findOne({ email: email.toLowerCase() });
 }
 async function findUserById(id) {
+    if (!isDbReady())
+        return (0, memoryUsers_1.memoryFindUserById)(id);
     return User_1.User.findById(id);
 }
 async function setResetPasswordToken(userId, token, expiresAt) {
+    if (!isDbReady())
+        return (0, memoryUsers_1.memorySetResetPasswordToken)(userId, token, expiresAt);
     await User_1.User.updateOne({ _id: userId }, { $set: { resetPasswordTokenHash: sha256(token), resetPasswordExpiresAt: expiresAt } });
 }
 async function findUserByValidResetToken(token) {
+    if (!isDbReady())
+        return (0, memoryUsers_1.memoryFindUserByValidResetToken)(token);
     const now = new Date();
     return User_1.User.findOne({
         resetPasswordTokenHash: sha256(token),
@@ -73,6 +92,8 @@ async function findUserByValidResetToken(token) {
 }
 async function resetPassword(userId, newPassword) {
     const passwordHash = await hashPassword(newPassword);
+    if (!isDbReady())
+        return (0, memoryUsers_1.memoryResetPassword)(userId, passwordHash);
     await User_1.User.updateOne({ _id: userId }, {
         $set: { passwordHash },
         $unset: { resetPasswordTokenHash: 1, resetPasswordExpiresAt: 1 },

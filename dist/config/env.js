@@ -10,9 +10,6 @@ exports.env = {
     FRONTEND_ORIGIN: process.env.FRONTEND_ORIGIN || '',
 };
 function assertEnv() {
-    if (!exports.env.MONGO_URI) {
-        throw new Error('Falta MONGO_URI en el entorno');
-    }
     if (!exports.env.JWT_SECRET) {
         throw new Error('Falta JWT_SECRET en el entorno');
     }

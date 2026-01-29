@@ -16,8 +16,12 @@ export function authRoutes() {
   const router = Router()
 
   router.post('/signup', asyncHandler(signup))
+  // Alias para compatibilidad (UI/preview): "register" = signup
+  router.post('/register', asyncHandler(signup))
   router.post('/login', asyncHandler(login))
   router.get('/me', requireAuth, asyncHandler(me))
+  // Alias para compatibilidad (UI/preview): "verify" = me
+  router.get('/verify', requireAuth, asyncHandler(me))
   router.post('/logout', requireAuth, asyncHandler(logout))
 
   router.post('/forgot-password', asyncHandler(forgotPassword))

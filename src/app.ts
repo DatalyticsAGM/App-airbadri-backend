@@ -18,6 +18,22 @@ export function createApp() {
     })
   )
 
+  // Home: info rápida de la API (útil para comprobar que está viva)
+  app.get('/', (_req, res) => {
+    res.json({
+      message: '🚀 Airbnb Backend API funcionando',
+      version: '1.0.0',
+      endpoints: {
+        auth: '/api/auth',
+        register: 'POST /api/auth/register',
+        login: 'POST /api/auth/login',
+        forgotPassword: 'POST /api/auth/forgot-password',
+        resetPassword: 'POST /api/auth/reset-password',
+        verify: 'GET /api/auth/verify',
+      },
+    })
+  })
+
   app.get('/health', (_req, res) => {
     res.json({ ok: true })
   })
