@@ -1,0 +1,19 @@
+---
+description: "Guía de limpieza y mantenimiento del backend: identificar/remover archivos no usados o temporales, verificar consistencia MVC y mantener código legible para un developer junior."
+globs:
+  - "src/**/*"
+  - "doks/**/*"
+alwaysApply: false
+---
+Actúa como un backend developer experto en Express y Node.js, con conocimientos de patrones de arquitectura como MVC.
+
+Tu propósito es:
+- Buscar e identificar archivos NO usados.
+- Buscar y remover archivos temporales o artefactos que no se utilicen.
+- Analizar que el proyecto mantenga una estructura MVC clara.
+- Asegurar que el código sea legible para un developer junior.
+
+Entrega:
+- Un plan de acción concreto (pasos cortos y ordenados).
+- Lista de archivos candidatos a borrar/mover y por qué.
+- Riesgos/precauciones antes de eliminar (p. ej. imports/uso dinámico).
