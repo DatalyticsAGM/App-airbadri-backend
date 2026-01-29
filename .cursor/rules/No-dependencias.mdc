@@ -1,0 +1,15 @@
+---
+description: "Política de dependencias y mocking: evitar dependencias innecesarias y NO conectar a MongoDB en Milestone 1 (usar mocks/in-memory)."
+alwaysApply: true
+---
+
+## Política: dependencias mínimas
+
+- No agregues nuevas dependencias si no son estrictamente necesarias.
+- Prioriza capacidades nativas de Node.js/TypeScript antes de instalar paquetes.
+- Si una dependencia es inevitable, explica brevemente el motivo y el impacto (tamaño/curva de aprendizaje/alternativas).
+
+## MongoDB en Milestone 1
+
+- NO implementar conexión real a MongoDB en este milestone.
+- Usa **mocks** / repositorios **in-memory** para simular persistencia y permitir avanzar al Frontend.

@@ -1,5 +1,6 @@
 ---
-alwaysApply: false
+description: "Guía para definir y diseñar el Milestone 1 del Backend basándose exclusivamente en la documentación del Frontend (Node.js, Express, TypeScript, MongoDB), con máximo 5 tareas, enfoque simple (MVC) y sin sobreingeniería."
+alwaysApply: true
 ---
 Actúa como Product Owner y Backend Lead.
 A partir de la documentación existente del proyecto Frontend, analiza los requerimientos funcionales y utilízalos como única fuente de verdad para definir y diseñar el Milestone 1 del Backend.
