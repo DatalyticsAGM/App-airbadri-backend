@@ -1,0 +1,81 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.toPublicUser = toPublicUser;
+exports.hashPassword = hashPassword;
+exports.verifyPassword = verifyPassword;
+exports.signAccessToken = signAccessToken;
+exports.sha256 = sha256;
+exports.generateResetToken = generateResetToken;
+exports.createUser = createUser;
+exports.findUserByEmail = findUserByEmail;
+exports.findUserById = findUserById;
+exports.setResetPasswordToken = setResetPasswordToken;
+exports.findUserByValidResetToken = findUserByValidResetToken;
+exports.resetPassword = resetPassword;
+const bcryptjs_1 = __importDefault(require("bcryptjs"));
+const crypto_1 = __importDefault(require("crypto"));
+const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const env_1 = require("../config/env");
+const User_1 = require("../models/User");
+function toPublicUser(user) {
+    return {
+        id: user._id.toString(),
+        fullName: user.fullName,
+        email: user.email,
+    };
+}
+async function hashPassword(password) {
+    const saltRounds = 10;
+    return bcryptjs_1.default.hash(password, saltRounds);
+}
+async function verifyPassword(password, passwordHash) {
+    return bcryptjs_1.default.compare(password, passwordHash);
+}
+function signAccessToken(userId) {
+    // jsonwebtoken v9 tipa expiresIn con un "StringValue" (p.ej. "7d").
+    const expiresIn = env_1.env.JWT_EXPIRES_IN;
+    return jsonwebtoken_1.default.sign({ sub: userId }, env_1.env.JWT_SECRET, { expiresIn });
+}
+function sha256(input) {
+    return crypto_1.default.createHash('sha256').update(input).digest('hex');
+}
+function generateResetToken() {
+    // Token corto y simple para dev. En prod se envía por email.
+    return crypto_1.default.randomBytes(32).toString('hex');
+}
+async function createUser(params) {
+    const passwordHash = await hashPassword(params.password);
+    const user = await User_1.User.create({
+        fullName: params.fullName,
+        email: params.email.toLowerCase(),
+        passwordHash,
+    });
+    return user;
+}
+async function findUserByEmail(email) {
+    return User_1.User.findOne({ email: email.toLowerCase() });
+}
+async function findUserById(id) {
+    return User_1.User.findById(id);
+}
+async function setResetPasswordToken(userId, token, expiresAt) {
+    await User_1.User.updateOne({ _id: userId }, { $set: { resetPasswordTokenHash: sha256(token), resetPasswordExpiresAt: expiresAt } });
+}
+async function findUserByValidResetToken(token) {
+    const now = new Date();
+    return User_1.User.findOne({
+        resetPasswordTokenHash: sha256(token),
+        resetPasswordExpiresAt: { $gt: now },
+    });
+}
+async function resetPassword(userId, newPassword) {
+    const passwordHash = await hashPassword(newPassword);
+    await User_1.User.updateOne({ _id: userId }, {
+        $set: { passwordHash },
+        $unset: { resetPasswordTokenHash: 1, resetPasswordExpiresAt: 1 },
+    });
+}
+//# sourceMappingURL=auth.service.js.map

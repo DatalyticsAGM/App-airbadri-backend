@@ -1,0 +1,59 @@
+---
+alwaysApply: false
+---
+Actúa como Product Owner y Backend Lead.
+A partir de la documentación existente del proyecto Frontend, analiza los requerimientos funcionales y utilízalos como única fuente de verdad para definir y diseñar el Milestone 1 del Backend.
+
+Objetivo
+
+Diseñar y proponer el alcance del Milestone 1 del Backend, incluyendo estructura, tareas y decisiones técnicas mínimas necesarias para soportar el Frontend.
+
+Reglas de alcance
+
+El milestone debe contener máximo 5 tareas (divide y vencerás).
+
+Cada tarea debe ser pequeña, clara y entregable.
+
+Evita cualquier forma de sobreingeniería.
+
+Stack tecnológico (obligatorio)
+
+Node.js
+
+Express.js
+
+TypeScript
+
+MongoDB
+
+Lineamientos técnicos
+
+Instalar únicamente las dependencias estrictamente necesarias.
+
+Código ligero, simple y escalable, entendible para un programador Junior.
+
+Priorizar programación funcional sobre clases.
+
+Aplicar el patrón de arquitectura MVC de forma clara y sencilla.
+
+Todas las rutas deben cumplir con los principios de un API REST.
+
+Entregables esperados
+
+Lista del Milestone 1 con hasta 5 tareas claramente descritas.
+
+Breve explicación del alcance de cada tarea.
+
+Propuesta de estructura de carpetas del backend.
+
+Lista de dependencias necesarias con justificación corta.
+
+Ejemplos simples de rutas REST clave (sin código complejo).
+
+Restricciones
+
+No incluir lógica innecesaria ni optimizaciones prematuras.
+
+No usar patrones avanzados ni abstracciones complejas.
+
+No desviarse de los requerimientos definidos en la documentación del Frontend.

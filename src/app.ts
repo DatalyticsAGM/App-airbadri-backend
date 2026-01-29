@@ -1,12 +1,35 @@
 import express from 'express'
+import cors from 'cors'
 
-const app = express()
-const port = 3333
+import { env } from './config/env'
+import { registerRoutes } from './routes'
+import { errorHandler } from './middlewares/errorHandler'
 
-app.get('/', (req, res) => {
-  res.send('Hello Worlddddda! esto es un cambio')
-})
+export function createApp() {
+  const app = express()
 
-app.listen(port, () => {
-  console.log(`listo para abrir http://localhost:${port}`)
-})
+  app.use(express.json())
+
+  // CORS: en dev permite tu frontend; si no se define, deja abierto.
+  app.use(
+    cors({
+      origin: env.FRONTEND_ORIGIN || true,
+      credentials: true,
+    })
+  )
+
+  app.get('/health', (_req, res) => {
+    res.json({ ok: true })
+  })
+
+  registerRoutes(app)
+
+  // 404 simple
+  app.use((_req, res) => {
+    res.status(404).json({ error: { code: 'NOT_FOUND', message: 'Not found' } })
+  })
+
+  app.use(errorHandler)
+
+  return app
+}
