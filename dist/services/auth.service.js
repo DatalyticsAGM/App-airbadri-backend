@@ -16,6 +16,8 @@ exports.findUserById = findUserById;
 exports.setResetPasswordToken = setResetPasswordToken;
 exports.findUserByValidResetToken = findUserByValidResetToken;
 exports.resetPassword = resetPassword;
+exports.updateUserProfile = updateUserProfile;
+exports.deleteUserById = deleteUserById;
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const crypto_1 = __importDefault(require("crypto"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
@@ -30,7 +32,8 @@ function getUserId(user) {
     return '_id' in user ? user._id.toString() : user.id;
 }
 function toPublicUser(user) {
-    return { id: getUserId(user), fullName: user.fullName, email: user.email };
+    const avatarUrl = 'avatarUrl' in user ? user.avatarUrl : undefined;
+    return { id: getUserId(user), fullName: user.fullName, email: user.email, avatarUrl };
 }
 async function hashPassword(password) {
     const saltRounds = 10;
@@ -98,5 +101,24 @@ async function resetPassword(userId, newPassword) {
         $set: { passwordHash },
         $unset: { resetPasswordTokenHash: 1, resetPasswordExpiresAt: 1 },
     });
+}
+async function updateUserProfile(userId, patch) {
+    if (!isDbReady()) {
+        return (0, memoryUsers_1.memoryUpdateUser)(userId, patch);
+    }
+    const $set = {};
+    if (typeof patch.fullName === 'string')
+        $set.fullName = patch.fullName;
+    if (typeof patch.email === 'string')
+        $set.email = patch.email.toLowerCase();
+    if (typeof patch.avatarUrl === 'string')
+        $set.avatarUrl = patch.avatarUrl;
+    return User_1.User.findByIdAndUpdate(userId, { $set }, { new: true });
+}
+async function deleteUserById(userId) {
+    if (!isDbReady())
+        return (0, memoryUsers_1.memoryDeleteUser)(userId);
+    const deleted = await User_1.User.findByIdAndDelete(userId);
+    return Boolean(deleted);
 }
 //# sourceMappingURL=auth.service.js.map

@@ -6,6 +6,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.memoryCreateUser = memoryCreateUser;
 exports.memoryFindUserByEmail = memoryFindUserByEmail;
 exports.memoryFindUserById = memoryFindUserById;
+exports.memoryUpdateUser = memoryUpdateUser;
+exports.memoryDeleteUser = memoryDeleteUser;
 exports.memorySetResetPasswordToken = memorySetResetPasswordToken;
 exports.memoryFindUserByValidResetToken = memoryFindUserByValidResetToken;
 exports.memoryResetPassword = memoryResetPassword;
@@ -35,6 +37,34 @@ function memoryFindUserByEmail(email) {
 }
 function memoryFindUserById(id) {
     return usersById.get(id) || null;
+}
+function memoryUpdateUser(userId, patch) {
+    const user = usersById.get(userId);
+    if (!user)
+        return null;
+    if (typeof patch.fullName === 'string') {
+        user.fullName = patch.fullName;
+    }
+    if (typeof patch.email === 'string') {
+        const nextEmail = patch.email.toLowerCase();
+        if (nextEmail !== user.email) {
+            usersByEmail.delete(user.email);
+            usersByEmail.set(nextEmail, userId);
+            user.email = nextEmail;
+        }
+    }
+    if (typeof patch.avatarUrl === 'string') {
+        user.avatarUrl = patch.avatarUrl;
+    }
+    return user;
+}
+function memoryDeleteUser(userId) {
+    const user = usersById.get(userId);
+    if (!user)
+        return false;
+    usersById.delete(userId);
+    usersByEmail.delete(user.email);
+    return true;
 }
 function memorySetResetPasswordToken(userId, token, expiresAt) {
     const user = usersById.get(userId);

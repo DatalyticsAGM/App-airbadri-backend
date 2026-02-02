@@ -4,6 +4,7 @@ export type MemoryUser = {
   id: string
   fullName: string
   email: string
+  avatarUrl?: string
   passwordHash: string
   resetPasswordTokenHash?: string
   resetPasswordExpiresAt?: Date
@@ -42,6 +43,42 @@ export function memoryFindUserByEmail(email: string) {
 
 export function memoryFindUserById(id: string) {
   return usersById.get(id) || null
+}
+
+export function memoryUpdateUser(
+  userId: string,
+  patch: { fullName?: string; email?: string; avatarUrl?: string }
+): MemoryUser | null {
+  const user = usersById.get(userId)
+  if (!user) return null
+
+  if (typeof patch.fullName === 'string') {
+    user.fullName = patch.fullName
+  }
+
+  if (typeof patch.email === 'string') {
+    const nextEmail = patch.email.toLowerCase()
+    if (nextEmail !== user.email) {
+      usersByEmail.delete(user.email)
+      usersByEmail.set(nextEmail, userId)
+      user.email = nextEmail
+    }
+  }
+
+  if (typeof patch.avatarUrl === 'string') {
+    user.avatarUrl = patch.avatarUrl
+  }
+
+  return user
+}
+
+export function memoryDeleteUser(userId: string) {
+  const user = usersById.get(userId)
+  if (!user) return false
+
+  usersById.delete(userId)
+  usersByEmail.delete(user.email)
+  return true
 }
 
 export function memorySetResetPasswordToken(userId: string, token: string, expiresAt: Date) {

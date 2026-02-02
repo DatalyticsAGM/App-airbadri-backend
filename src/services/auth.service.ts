@@ -7,15 +7,17 @@ import { env } from '../config/env'
 import { User, type UserDoc } from '../models/User'
 import {
   memoryCreateUser,
+  memoryDeleteUser,
   memoryFindUserByEmail,
   memoryFindUserById,
   memoryFindUserByValidResetToken,
   memoryResetPassword,
   memorySetResetPasswordToken,
+  memoryUpdateUser,
   type MemoryUser,
 } from '../store/memoryUsers'
 
-export type PublicUser = { id: string; fullName: string; email: string }
+export type PublicUser = { id: string; fullName: string; email: string; avatarUrl?: string }
 
 type StoredUser = UserDoc | MemoryUser
 
@@ -28,7 +30,8 @@ export function getUserId(user: StoredUser) {
 }
 
 export function toPublicUser(user: StoredUser): PublicUser {
-  return { id: getUserId(user), fullName: user.fullName, email: user.email }
+  const avatarUrl = 'avatarUrl' in user ? (user as any).avatarUrl : undefined
+  return { id: getUserId(user), fullName: user.fullName, email: user.email, avatarUrl }
 }
 
 export async function hashPassword(password: string) {
@@ -114,5 +117,28 @@ export async function resetPassword(userId: string, newPassword: string) {
       $unset: { resetPasswordTokenHash: 1, resetPasswordExpiresAt: 1 },
     }
   )
+}
+
+export async function updateUserProfile(
+  userId: string,
+  patch: { fullName?: string; email?: string; avatarUrl?: string }
+) {
+  if (!isDbReady()) {
+    return memoryUpdateUser(userId, patch)
+  }
+
+  const $set: { fullName?: string; email?: string; avatarUrl?: string } = {}
+  if (typeof patch.fullName === 'string') $set.fullName = patch.fullName
+  if (typeof patch.email === 'string') $set.email = patch.email.toLowerCase()
+  if (typeof patch.avatarUrl === 'string') $set.avatarUrl = patch.avatarUrl
+
+  return User.findByIdAndUpdate(userId, { $set }, { new: true })
+}
+
+export async function deleteUserById(userId: string) {
+  if (!isDbReady()) return memoryDeleteUser(userId)
+
+  const deleted = await User.findByIdAndDelete(userId)
+  return Boolean(deleted)
 }
 

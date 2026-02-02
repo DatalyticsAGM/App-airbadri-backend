@@ -25,6 +25,13 @@ export function createApp() {
       version: '1.0.0',
       endpoints: {
         auth: '/api/auth',
+        users: '/api/users',
+        properties: '/api/properties',
+        bookings: '/api/bookings',
+        reviews: '/api/reviews',
+        notifications: '/api/notifications',
+        favorites: '/api/favorites',
+        host: '/api/host',
         register: 'POST /api/auth/register',
         login: 'POST /api/auth/login',
         forgotPassword: 'POST /api/auth/forgot-password',
