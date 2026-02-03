@@ -14,6 +14,23 @@
       "item": [
         {
           "name": "GET /",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200\", function() { pm.response.to.have.status(200); });",
+                  "pm.test(\"Response has message and version\", function() {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('message');",
+                  "    pm.expect(json).to.have.property('version');",
+                  "    pm.expect(json).to.have.property('endpoints');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [],
@@ -23,6 +40,21 @@
         },
         {
           "name": "GET /health",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200\", function() { pm.response.to.have.status(200); });",
+                  "pm.test(\"Body has ok true\", function() {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('ok', true);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [],
@@ -32,6 +64,22 @@
         },
         {
           "name": "GET /ready",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200\", function() { pm.response.to.have.status(200); });",
+                  "pm.test(\"Body has ok and ready\", function() {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('ok', true);",
+                  "    pm.expect(json).to.have.property('ready', true);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [],
@@ -41,6 +89,23 @@
         },
         {
           "name": "GET /api/info",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200\", function() { pm.response.to.have.status(200); });",
+                  "pm.test(\"Response has version and memoryOnly\", function() {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('version');",
+                  "    pm.expect(json).to.have.property('memoryOnly');",
+                  "    pm.expect(json).to.have.property('env');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [],
@@ -55,6 +120,18 @@
       "item": [
         {
           "name": "POST /api/dev/seed",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200\", function() { pm.response.to.have.status(200); });",
+                  "pm.test(\"Response is JSON\", function() { pm.response.to.be.json; });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [],
@@ -73,7 +150,15 @@
             {
               "listen": "test",
               "script": {
-                "exec": ["var json = pm.response.json(); if (json.accessToken) { pm.collectionVariables.set('accessToken', json.accessToken); }"],
+                "exec": [
+                  "var json = pm.response.json(); if (json.accessToken) { pm.collectionVariables.set('accessToken', json.accessToken); }",
+                  "pm.test(\"Status 201\", function() { pm.response.to.have.status(201); });",
+                  "pm.test(\"Response has user and accessToken\", function() {",
+                  "    const j = pm.response.json();",
+                  "    pm.expect(j).to.have.property('user');",
+                  "    pm.expect(j).to.have.property('accessToken');",
+                  "});"
+                ],
                 "type": "text/javascript"
               }
             }
@@ -95,7 +180,15 @@
             {
               "listen": "test",
               "script": {
-                "exec": ["var json = pm.response.json(); if (json.accessToken) { pm.collectionVariables.set('accessToken', json.accessToken); }"],
+                "exec": [
+                  "var json = pm.response.json(); if (json.accessToken) { pm.collectionVariables.set('accessToken', json.accessToken); }",
+                  "pm.test(\"Status 201\", function() { pm.response.to.have.status(201); });",
+                  "pm.test(\"Response has user and accessToken\", function() {",
+                  "    const j = pm.response.json();",
+                  "    pm.expect(j).to.have.property('user');",
+                  "    pm.expect(j).to.have.property('accessToken');",
+                  "});"
+                ],
                 "type": "text/javascript"
               }
             }
@@ -117,7 +210,15 @@
             {
               "listen": "test",
               "script": {
-                "exec": ["var json = pm.response.json(); if (json.accessToken) { pm.collectionVariables.set('accessToken', json.accessToken); }"],
+                "exec": [
+                  "var json = pm.response.json(); if (json.accessToken) { pm.collectionVariables.set('accessToken', json.accessToken); }",
+                  "pm.test(\"Status 200\", function() { pm.response.to.have.status(200); });",
+                  "pm.test(\"Response has user and accessToken\", function() {",
+                  "    const j = pm.response.json();",
+                  "    pm.expect(j).to.have.property('user');",
+                  "    pm.expect(j).to.have.property('accessToken');",
+                  "});"
+                ],
                 "type": "text/javascript"
               }
             }
@@ -135,6 +236,21 @@
         },
         {
           "name": "GET /api/auth/me",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200\", function() { pm.response.to.have.status(200); });",
+                  "pm.test(\"Response has user\", function() {",
+                  "    const j = pm.response.json();",
+                  "    pm.expect(j).to.have.property('user');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
@@ -144,6 +260,21 @@
         },
         {
           "name": "GET /api/auth/verify",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200\", function() { pm.response.to.have.status(200); });",
+                  "pm.test(\"Response has user\", function() {",
+                  "    const j = pm.response.json();",
+                  "    pm.expect(j).to.have.property('user');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
@@ -153,6 +284,21 @@
         },
         {
           "name": "POST /api/auth/logout",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200\", function() { pm.response.to.have.status(200); });",
+                  "pm.test(\"Response has ok\", function() {",
+                  "    const j = pm.response.json();",
+                  "    pm.expect(j).to.have.property('ok', true);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
@@ -162,6 +308,21 @@
         },
         {
           "name": "POST /api/auth/forgot-password",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200\", function() { pm.response.to.have.status(200); });",
+                  "pm.test(\"Response has ok\", function() {",
+                  "    const j = pm.response.json();",
+                  "    pm.expect(j).to.have.property('ok', true);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
@@ -175,6 +336,20 @@
         },
         {
           "name": "GET /api/auth/reset-password/validate",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200 or 400\", function() {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 400]);",
+                  "});",
+                  "pm.test(\"Response is JSON\", function() { pm.response.to.be.json; });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [],
@@ -184,6 +359,20 @@
         },
         {
           "name": "POST /api/auth/reset-password",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200 or 400\", function() {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 400]);",
+                  "});",
+                  "pm.test(\"Response is JSON\", function() { pm.response.to.be.json; });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
@@ -202,6 +391,22 @@
       "item": [
         {
           "name": "GET /api/users/me",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200\", function() { pm.response.to.have.status(200); });",
+                  "pm.test(\"Response has user and stats\", function() {",
+                  "    const j = pm.response.json();",
+                  "    pm.expect(j).to.have.property('user');",
+                  "    pm.expect(j).to.have.property('stats');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
@@ -211,6 +416,21 @@
         },
         {
           "name": "PATCH /api/users/me",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200\", function() { pm.response.to.have.status(200); });",
+                  "pm.test(\"Response has user\", function() {",
+                  "    const j = pm.response.json();",
+                  "    pm.expect(j).to.have.property('user');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "PATCH",
             "header": [
@@ -227,6 +447,21 @@
         },
         {
           "name": "DELETE /api/users/me",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200\", function() { pm.response.to.have.status(200); });",
+                  "pm.test(\"Response has ok\", function() {",
+                  "    const j = pm.response.json();",
+                  "    pm.expect(j).to.have.property('ok', true);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "DELETE",
             "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
@@ -241,6 +476,22 @@
       "item": [
         {
           "name": "GET /api/properties (list)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200\", function() { pm.response.to.have.status(200); });",
+                  "pm.test(\"Response has items array\", function() {",
+                  "    const j = pm.response.json();",
+                  "    pm.expect(j).to.have.property('items');",
+                  "    pm.expect(j.items).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [],
@@ -267,6 +518,22 @@
         },
         {
           "name": "GET /api/properties/mine",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200\", function() { pm.response.to.have.status(200); });",
+                  "pm.test(\"Response has items array\", function() {",
+                  "    const j = pm.response.json();",
+                  "    pm.expect(j).to.have.property('items');",
+                  "    pm.expect(j.items).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
@@ -276,6 +543,26 @@
         },
         {
           "name": "GET /api/properties/:id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200 or 404\", function() {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 404]);",
+                  "});",
+                  "if (pm.response.code === 200) {",
+                  "    pm.test(\"Response has property fields\", function() {",
+                  "        const j = pm.response.json();",
+                  "        pm.expect(j).to.have.property('id');",
+                  "        pm.expect(j).to.have.property('title');",
+                  "    });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [],
@@ -285,6 +572,24 @@
         },
         {
           "name": "GET /api/properties/:id/availability",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200 or 404\", function() {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 404]);",
+                  "});",
+                  "if (pm.response.code === 200) {",
+                  "    pm.test(\"Response has available\", function() {",
+                  "        pm.expect(pm.response.json()).to.have.property('available');",
+                  "    });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [],
@@ -302,6 +607,26 @@
         },
         {
           "name": "GET /api/properties/:id/booking-preview",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200 or 404\", function() {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 404]);",
+                  "});",
+                  "if (pm.response.code === 200) {",
+                  "    pm.test(\"Response has booking preview fields\", function() {",
+                  "        const j = pm.response.json();",
+                  "        pm.expect(j).to.have.property('available');",
+                  "        pm.expect(j).to.have.property('totalPrice');",
+                  "    });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [],
@@ -320,6 +645,24 @@
         },
         {
           "name": "GET /api/properties/:id/reviews",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200 or 404\", function() {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 404]);",
+                  "});",
+                  "if (pm.response.code === 200) {",
+                  "    pm.test(\"Response has items\", function() {",
+                  "        pm.expect(pm.response.json()).to.have.property('items');",
+                  "    });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [],
@@ -329,6 +672,22 @@
         },
         {
           "name": "POST /api/properties",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 201\", function() { pm.response.to.have.status(201); });",
+                  "pm.test(\"Response has property id and title\", function() {",
+                  "    const j = pm.response.json();",
+                  "    pm.expect(j).to.have.property('id');",
+                  "    pm.expect(j).to.have.property('title');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [
@@ -345,6 +704,26 @@
         },
         {
           "name": "POST /api/properties/:id/reviews",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 201 or 400/404\", function() {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([201, 400, 404]);",
+                  "});",
+                  "if (pm.response.code === 201) {",
+                  "    pm.test(\"Response has review\", function() {",
+                  "        const j = pm.response.json();",
+                  "        pm.expect(j).to.have.property('id');",
+                  "        pm.expect(j).to.have.property('rating');",
+                  "    });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [
@@ -361,6 +740,24 @@
         },
         {
           "name": "PATCH /api/properties/:id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200 or 403/404\", function() {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 403, 404]);",
+                  "});",
+                  "if (pm.response.code === 200) {",
+                  "    pm.test(\"Response has property\", function() {",
+                  "        pm.expect(pm.response.json()).to.have.property('id');",
+                  "    });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "PATCH",
             "header": [
@@ -377,6 +774,19 @@
         },
         {
           "name": "DELETE /api/properties/:id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 204 or 403/404\", function() {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([204, 403, 404]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "DELETE",
             "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
@@ -391,6 +801,20 @@
       "item": [
         {
           "name": "GET /api/bookings",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200\", function() { pm.response.to.have.status(200); });",
+                  "pm.test(\"Response has items\", function() {",
+                  "    pm.expect(pm.response.json()).to.have.property('items');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
@@ -400,6 +824,26 @@
         },
         {
           "name": "GET /api/bookings/:id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200 or 404\", function() {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 404]);",
+                  "});",
+                  "if (pm.response.code === 200) {",
+                  "    pm.test(\"Response has booking\", function() {",
+                  "        const j = pm.response.json();",
+                  "        pm.expect(j).to.have.property('id');",
+                  "        pm.expect(j).to.have.property('status');",
+                  "    });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
@@ -409,6 +853,26 @@
         },
         {
           "name": "POST /api/bookings",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 201 or 400/404\", function() {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([201, 400, 404]);",
+                  "});",
+                  "if (pm.response.code === 201) {",
+                  "    pm.test(\"Response has booking\", function() {",
+                  "        const j = pm.response.json();",
+                  "        pm.expect(j).to.have.property('id');",
+                  "        pm.expect(j).to.have.property('status');",
+                  "    });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [
@@ -425,6 +889,24 @@
         },
         {
           "name": "PATCH /api/bookings/:id (cancel)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200 or 403/404\", function() {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 403, 404]);",
+                  "});",
+                  "if (pm.response.code === 200) {",
+                  "    pm.test(\"Response has status\", function() {",
+                  "        pm.expect(pm.response.json()).to.have.property('status');",
+                  "    });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "PATCH",
             "header": [
@@ -446,6 +928,24 @@
       "item": [
         {
           "name": "PATCH /api/reviews/:id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200 or 403/404\", function() {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 403, 404]);",
+                  "});",
+                  "if (pm.response.code === 200) {",
+                  "    pm.test(\"Response has review\", function() {",
+                  "        pm.expect(pm.response.json()).to.have.property('id');",
+                  "    });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "PATCH",
             "header": [
@@ -462,6 +962,24 @@
         },
         {
           "name": "DELETE /api/reviews/:id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200 or 403/404\", function() {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 403, 404]);",
+                  "});",
+                  "if (pm.response.code === 200) {",
+                  "    pm.test(\"Response has ok\", function() {",
+                  "        pm.expect(pm.response.json()).to.have.property('ok', true);",
+                  "    });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "DELETE",
             "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
@@ -476,6 +994,20 @@
       "item": [
         {
           "name": "GET /api/favorites",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200\", function() { pm.response.to.have.status(200); });",
+                  "pm.test(\"Response has items\", function() {",
+                  "    pm.expect(pm.response.json()).to.have.property('items');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
@@ -485,6 +1017,24 @@
         },
         {
           "name": "POST /api/favorites",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 201 or 404\", function() {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([201, 404]);",
+                  "});",
+                  "if (pm.response.code === 201) {",
+                  "    pm.test(\"Response has favorite\", function() {",
+                  "        pm.expect(pm.response.json()).to.have.property('propertyId');",
+                  "    });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [
@@ -501,6 +1051,20 @@
         },
         {
           "name": "GET /api/favorites/:propertyId",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200\", function() { pm.response.to.have.status(200); });",
+                  "pm.test(\"Response has favorite\", function() {",
+                  "    pm.expect(pm.response.json()).to.have.property('favorite');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
@@ -510,6 +1074,20 @@
         },
         {
           "name": "DELETE /api/favorites/:propertyId",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200\", function() { pm.response.to.have.status(200); });",
+                  "pm.test(\"Response has favorite\", function() {",
+                  "    pm.expect(pm.response.json()).to.have.property('favorite');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "DELETE",
             "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
@@ -524,6 +1102,20 @@
       "item": [
         {
           "name": "GET /api/notifications",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200\", function() { pm.response.to.have.status(200); });",
+                  "pm.test(\"Response has items\", function() {",
+                  "    pm.expect(pm.response.json()).to.have.property('items');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
@@ -533,6 +1125,20 @@
         },
         {
           "name": "GET /api/notifications/unread-count",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200\", function() { pm.response.to.have.status(200); });",
+                  "pm.test(\"Response has unread\", function() {",
+                  "    pm.expect(pm.response.json()).to.have.property('unread');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
@@ -542,6 +1148,22 @@
         },
         {
           "name": "POST /api/notifications (create mock)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 201\", function() { pm.response.to.have.status(201); });",
+                  "pm.test(\"Response has notification\", function() {",
+                  "    const j = pm.response.json();",
+                  "    pm.expect(j).to.have.property('id');",
+                  "    pm.expect(j).to.have.property('title');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [
@@ -558,6 +1180,18 @@
         },
         {
           "name": "POST /api/notifications/read-all",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200\", function() { pm.response.to.have.status(200); });",
+                  "pm.test(\"Response is JSON\", function() { pm.response.to.be.json; });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
@@ -567,6 +1201,20 @@
         },
         {
           "name": "PATCH /api/notifications/:id/read",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200 or 404\", function() {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 404]);",
+                  "});",
+                  "pm.test(\"Response is JSON\", function() { pm.response.to.be.json; });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "PATCH",
             "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
@@ -581,6 +1229,21 @@
       "item": [
         {
           "name": "GET /api/host/dashboard",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200\", function() { pm.response.to.have.status(200); });",
+                  "pm.test(\"Response has stats\", function() {",
+                  "    const j = pm.response.json();",
+                  "    pm.expect(j).to.have.property('stats');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
@@ -595,6 +1258,20 @@
       "item": [
         {
           "name": "GET /api/search/suggestions",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200\", function() { pm.response.to.have.status(200); });",
+                  "pm.test(\"Response has suggestions\", function() {",
+                  "    pm.expect(pm.response.json()).to.have.property('suggestions');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [],
@@ -604,6 +1281,20 @@
         },
         {
           "name": "GET /api/search/history",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200\", function() { pm.response.to.have.status(200); });",
+                  "pm.test(\"Response has items\", function() {",
+                  "    pm.expect(pm.response.json()).to.have.property('items');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
@@ -613,6 +1304,22 @@
         },
         {
           "name": "POST /api/search/history",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 201\", function() { pm.response.to.have.status(201); });",
+                  "pm.test(\"Response has ok and items\", function() {",
+                  "    const j = pm.response.json();",
+                  "    pm.expect(j).to.have.property('ok', true);",
+                  "    pm.expect(j).to.have.property('items');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [
@@ -629,6 +1336,20 @@
         },
         {
           "name": "DELETE /api/search/history",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200\", function() { pm.response.to.have.status(200); });",
+                  "pm.test(\"Response has ok\", function() {",
+                  "    pm.expect(pm.response.json()).to.have.property('ok', true);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "DELETE",
             "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
