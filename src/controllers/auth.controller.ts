@@ -80,8 +80,8 @@ export async function forgotPassword(req: Request, res: Response) {
   const expiresAt = new Date(Date.now() + 15 * 60 * 1000) // 15 minutos
   await setResetPasswordToken(getUserId(user), resetToken, expiresAt)
 
-  // Modo dev: se devuelve el token para que el frontend lo use.
-  res.json({ resetToken, expiresAt: expiresAt.toISOString() })
+  // Modo dev: se devuelve el token para que el frontend lo use (M1 contrato: ok + resetToken).
+  res.json({ ok: true, resetToken, expiresAt: expiresAt.toISOString() })
 }
 
 export async function validateResetToken(req: Request, res: Response) {

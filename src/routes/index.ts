@@ -6,6 +6,7 @@ import { hostRoutes } from './host.routes'
 import { notificationsRoutes } from './notifications.routes'
 import { propertiesRoutes } from './properties.routes'
 import { reviewsRoutes } from './reviews.routes'
+import { searchRoutes } from './search.routes'
 import { usersRoutes } from './users.routes'
 
 export function registerRoutes(app: Express) {
@@ -16,6 +17,7 @@ export function registerRoutes(app: Express) {
   app.use('/api/notifications', notificationsRoutes())
   app.use('/api/properties', propertiesRoutes())
   app.use('/api/reviews', reviewsRoutes())
+  app.use('/api/search', searchRoutes())
   app.use('/api/users', usersRoutes())
 }
 

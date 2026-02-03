@@ -20,6 +20,8 @@ export type ListPropertiesResult = {
   total: number
 }
 
+export type PropertySort = 'price_asc' | 'price_desc' | 'rating_desc' | 'newest' | 'relevance'
+
 export type PropertyFilters = {
   q?: string
   location?: string
@@ -34,6 +36,7 @@ export type PropertyFilters = {
   minBathrooms?: number
   minGuests?: number
   hostId?: string
+  sort?: PropertySort
   page?: number
   limit?: number
 }
@@ -112,6 +115,19 @@ export function listProperties(filters: PropertyFilters): ListPropertiesResult {
     }
     items = items.filter((p) => isPropertyAvailable(p.id, checkIn, checkOut))
   }
+
+  const sort = (filters.sort || 'relevance') as PropertySort
+  const validSorts: PropertySort[] = ['price_asc', 'price_desc', 'rating_desc', 'newest', 'relevance']
+  const sortKey = validSorts.includes(sort) ? sort : 'relevance'
+
+  if (sortKey === 'price_asc') items = [...items].sort((a, b) => a.pricePerNight - b.pricePerNight)
+  else if (sortKey === 'price_desc') items = [...items].sort((a, b) => b.pricePerNight - a.pricePerNight)
+  else if (sortKey === 'rating_desc') {
+    items = [...items].sort((a, b) => memoryCalculateAverageRating(b.id) - memoryCalculateAverageRating(a.id))
+  } else if (sortKey === 'newest') {
+    items = [...items].sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+  }
+  // 'relevance': mantener orden actual (ya filtrado por q/location)
 
   const total = items.length
   const start = (page - 1) * limit

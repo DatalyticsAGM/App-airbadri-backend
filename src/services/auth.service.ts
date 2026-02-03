@@ -22,6 +22,7 @@ export type PublicUser = { id: string; fullName: string; email: string; avatarUr
 type StoredUser = UserDoc | MemoryUser
 
 function isDbReady() {
+  if (env.USE_MEMORY_ONLY) return false
   return mongoose.connection.readyState === 1
 }
 

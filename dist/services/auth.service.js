@@ -26,6 +26,8 @@ const env_1 = require("../config/env");
 const User_1 = require("../models/User");
 const memoryUsers_1 = require("../store/memoryUsers");
 function isDbReady() {
+    if (env_1.env.USE_MEMORY_ONLY)
+        return false;
     return mongoose_1.default.connection.readyState === 1;
 }
 function getUserId(user) {

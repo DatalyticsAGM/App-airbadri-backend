@@ -6,6 +6,7 @@ import {
   createPropertyHandler,
   deletePropertyHandler,
   getAvailabilityHandler,
+  getBookingPreviewHandler,
   getPropertyHandler,
   listMineHandler,
   listPropertiesHandler,
@@ -19,6 +20,7 @@ export function propertiesRoutes() {
   router.get('/', asyncHandler(listPropertiesHandler))
   router.get('/mine', requireAuth, asyncHandler(listMineHandler))
   router.get('/:id/availability', asyncHandler(getAvailabilityHandler))
+  router.get('/:id/booking-preview', asyncHandler(getBookingPreviewHandler))
   router.get('/:id/reviews', asyncHandler(listPropertyReviewsHandler))
   router.get('/:id', asyncHandler(getPropertyHandler))
 

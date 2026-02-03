@@ -2,6 +2,7 @@ import type { Request, Response } from 'express'
 
 import { httpError } from '../middlewares/errorHandler'
 import { isPropertyAvailable } from '../services/bookings.service'
+import { getBookingPreview } from '../services/bookings.service'
 import {
   createProperty,
   deleteProperty,
@@ -66,6 +67,9 @@ export async function listPropertiesHandler(req: Request, res: Response) {
   const limit = toInt(req.query?.limit)
   if (limit !== null) filters.limit = limit
 
+  const sort = String(req.query?.sort || '').trim()
+  if (sort) filters.sort = sort as any
+
   const result = listProperties(filters)
   res.json(result)
 }
@@ -82,7 +86,6 @@ export async function getAvailabilityHandler(req: Request, res: Response) {
   const id = String(req.params?.id || '').trim()
   if (!id) throw httpError(400, 'VALIDATION_ERROR', 'id is required')
 
-  // Valida que exista la propiedad (404 consistente).
   getPropertyByIdOrThrow(id)
 
   const checkIn = String(req.query?.checkIn || '').trim()
@@ -93,6 +96,21 @@ export async function getAvailabilityHandler(req: Request, res: Response) {
 
   const available = isPropertyAvailable(id, checkIn, checkOut)
   res.json({ available })
+}
+
+export async function getBookingPreviewHandler(req: Request, res: Response) {
+  const id = String(req.params?.id || '').trim()
+  if (!id) throw httpError(400, 'VALIDATION_ERROR', 'id is required')
+
+  const checkIn = String(req.query?.checkIn || '').trim()
+  const checkOut = String(req.query?.checkOut || '').trim()
+  const guests = Number(req.query?.guests) || 1
+  if (!checkIn || !checkOut) {
+    throw httpError(400, 'VALIDATION_ERROR', 'checkIn and checkOut are required')
+  }
+
+  const preview = getBookingPreview(id, checkIn, checkOut, guests)
+  res.json(preview)
 }
 
 export async function listMineHandler(req: Request, res: Response) {

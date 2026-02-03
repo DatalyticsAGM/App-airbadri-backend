@@ -6,11 +6,11 @@ const db_1 = require("./config/db");
 const env_1 = require("./config/env");
 async function main() {
     (0, env_1.assertEnv)();
-    if (env_1.env.MONGO_URI) {
+    if (env_1.env.MONGO_URI && !env_1.env.USE_MEMORY_ONLY) {
         await (0, db_1.connectDb)(env_1.env.MONGO_URI);
     }
     else {
-        console.log('MongoDB desactivado: iniciando en modo memoria (sin persistencia).');
+        console.log('Backend en modo MOCK: persistencia en memoria (sin MongoDB).');
     }
     const app = (0, app_1.createApp)();
     app.listen(env_1.env.PORT, () => {

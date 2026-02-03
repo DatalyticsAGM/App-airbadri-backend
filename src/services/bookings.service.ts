@@ -41,6 +41,40 @@ export function isPropertyAvailable(propertyId: string, checkIn: string, checkOu
   return true
 }
 
+export type BookingPreview = {
+  available: boolean
+  pricePerNight: number
+  nights: number
+  totalPrice: number
+}
+
+export function getBookingPreview(propertyId: string, checkIn: string, checkOut: string, guests: number) {
+  const property = memoryGetPropertyById(propertyId)
+  if (!property) throw httpError(404, 'PROPERTY_NOT_FOUND', 'Property not found')
+
+  const inDate = parseDate(checkIn)
+  const outDate = parseDate(checkOut)
+  if (!inDate || !outDate) throw httpError(400, 'VALIDATION_ERROR', 'Invalid dates')
+  if (inDate >= outDate) throw httpError(400, 'VALIDATION_ERROR', 'checkIn must be before checkOut')
+
+  const g = Math.trunc(Number(guests))
+  if (!Number.isFinite(g) || g <= 0) throw httpError(400, 'VALIDATION_ERROR', 'guests is invalid')
+  if (property.maxGuests && g > property.maxGuests) {
+    throw httpError(400, 'GUESTS_EXCEED_MAX', 'Number of guests exceeds property capacity')
+  }
+
+  const available = isPropertyAvailable(propertyId, checkIn, checkOut)
+  const nights = Math.round((outDate.getTime() - inDate.getTime()) / MS_PER_DAY)
+  const totalPrice = nights > 0 ? nights * property.pricePerNight : 0
+
+  return {
+    available,
+    pricePerNight: property.pricePerNight,
+    nights: nights > 0 ? nights : 0,
+    totalPrice,
+  }
+}
+
 export function listMyBookings(userId: string) {
   return memoryListBookingsByUser(userId)
 }
@@ -74,7 +108,7 @@ export function createBooking(userId: string, input: {
   const guests = Math.trunc(Number(input.guests))
   if (!Number.isFinite(guests) || guests <= 0) throw httpError(400, 'VALIDATION_ERROR', 'guests is invalid')
   if (property.maxGuests && guests > property.maxGuests) {
-    throw httpError(400, 'VALIDATION_ERROR', 'guests exceeds maxGuests')
+    throw httpError(400, 'GUESTS_EXCEED_MAX', 'Number of guests exceeds property capacity')
   }
 
   const available = isPropertyAvailable(propertyId, checkIn, checkOut)

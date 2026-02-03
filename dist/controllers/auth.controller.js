@@ -67,8 +67,8 @@ async function forgotPassword(req, res) {
     const resetToken = (0, auth_service_1.generateResetToken)();
     const expiresAt = new Date(Date.now() + 15 * 60 * 1000); // 15 minutos
     await (0, auth_service_1.setResetPasswordToken)((0, auth_service_1.getUserId)(user), resetToken, expiresAt);
-    // Modo dev: se devuelve el token para que el frontend lo use.
-    res.json({ resetToken, expiresAt: expiresAt.toISOString() });
+    // Modo dev: se devuelve el token para que el frontend lo use (M1 contrato: ok + resetToken).
+    res.json({ ok: true, resetToken, expiresAt: expiresAt.toISOString() });
 }
 async function validateResetToken(req, res) {
     const token = String(req.query?.token || '').trim();

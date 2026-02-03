@@ -6,10 +6,10 @@ import { assertEnv, env } from './config/env'
 
 async function main() {
   assertEnv()
-  if (env.MONGO_URI) {
+  if (env.MONGO_URI && !env.USE_MEMORY_ONLY) {
     await connectDb(env.MONGO_URI)
   } else {
-    console.log('MongoDB desactivado: iniciando en modo memoria (sin persistencia).')
+    console.log('Backend en modo MOCK: persistencia en memoria (sin MongoDB).')
   }
 
   const app = createApp()

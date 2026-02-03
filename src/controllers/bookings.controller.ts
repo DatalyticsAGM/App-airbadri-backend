@@ -26,8 +26,20 @@ export async function getMyBookingHandler(req: Request, res: Response) {
   const id = String(req.params?.id || '').trim()
   if (!id) throw httpError(400, 'VALIDATION_ERROR', 'id is required')
 
+  const include = String(req.query?.include || '').trim().toLowerCase()
+  const withProperty = include === 'property'
+
   const booking = getMyBookingByIdOrThrow(userId, id)
-  res.json({ ...booking, status: normalizeBookingStatus(booking) })
+  const payload: Record<string, unknown> = { ...booking, status: normalizeBookingStatus(booking) }
+  if (withProperty) {
+    const { getPropertyByIdOrThrow } = await import('../services/properties.service')
+    try {
+      payload.property = getPropertyByIdOrThrow(booking.propertyId)
+    } catch {
+      payload.property = null
+    }
+  }
+  res.json(payload)
 }
 
 export async function createBookingHandler(req: Request, res: Response) {

@@ -45,6 +45,10 @@ export function createApp() {
     res.json({ ok: true })
   })
 
+  app.get('/ready', (_req, res) => {
+    res.json({ ok: true, ready: true })
+  })
+
   registerRoutes(app)
 
   // 404 simple
