@@ -8,7 +8,12 @@ const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
 const env_1 = require("./config/env");
 const routes_1 = require("./routes");
+const dev_routes_1 = require("./routes/dev.routes");
 const errorHandler_1 = require("./middlewares/errorHandler");
+const API_VERSION = '1.0.0';
+function isDevMode() {
+    return env_1.env.USE_MEMORY_ONLY || process.env.NODE_ENV === 'development';
+}
 function createApp() {
     const app = (0, express_1.default)();
     app.use(express_1.default.json());
@@ -21,7 +26,7 @@ function createApp() {
     app.get('/', (_req, res) => {
         res.json({
             message: '🚀 Airbnb Backend API funcionando',
-            version: '1.0.0',
+            version: API_VERSION,
             endpoints: {
                 auth: '/api/auth',
                 users: '/api/users',
@@ -39,6 +44,13 @@ function createApp() {
             },
         });
     });
+    app.get('/api/info', (_req, res) => {
+        res.json({
+            version: API_VERSION,
+            memoryOnly: env_1.env.USE_MEMORY_ONLY,
+            env: process.env.NODE_ENV === 'production' ? 'production' : 'development',
+        });
+    });
     app.get('/health', (_req, res) => {
         res.json({ ok: true });
     });
@@ -46,6 +58,9 @@ function createApp() {
         res.json({ ok: true, ready: true });
     });
     (0, routes_1.registerRoutes)(app);
+    if (isDevMode()) {
+        app.use('/api/dev', (0, dev_routes_1.devRoutes)());
+    }
     // 404 simple
     app.use((_req, res) => {
         res.status(404).json({ error: { code: 'NOT_FOUND', message: 'Not found' } });

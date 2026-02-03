@@ -112,3 +112,9 @@ export function memoryResetPassword(userId: string, newPasswordHash: string) {
   delete user.resetPasswordExpiresAt
 }
 
+/** Solo para uso en seed de desarrollo. Vacía todos los usuarios. */
+export function memoryResetForDev() {
+  usersById.clear()
+  usersByEmail.clear()
+}
+

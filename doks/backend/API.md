@@ -7,12 +7,21 @@ Códigos comunes: `400` (validación), `401` (no autenticado), `403` (no autoriz
 
 ---
 
-## Health
+## Health e info
 
 | Método | Ruta     | Auth | Descripción        |
 |--------|----------|------|--------------------|
 | GET    | /health  | No   | Liveness. Responde `{ "ok": true }`. |
 | GET    | /ready   | No   | Readiness. Responde `{ "ok": true, "ready": true }`. |
+| GET    | /api/info | No  | Información de la API. 200: `{ "version", "memoryOnly", "env" }`. (M7) |
+
+---
+
+## Dev (solo con USE_MEMORY_ONLY o NODE_ENV=development)
+
+| Método | Ruta            | Auth | Descripción |
+|--------|------------------|------|-------------|
+| POST   | /api/dev/seed    | No   | Resetea stores in-memory y crea datos de ejemplo (usuarios, propiedades, reservas). 200: `{ "ok": true, "users", "propertiesCount", "bookingsCount" }`. En producción sin modo memoria: 404. (M7) |
 
 ---
 

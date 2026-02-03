@@ -44,3 +44,8 @@ export function memoryRemoveFavorite(userId: string, propertyId: string) {
   return map.delete(propertyId)
 }
 
+/** Solo para uso en seed de desarrollo. Vacía todos los favoritos. */
+export function memoryResetForDev() {
+  favoritesByUser.clear()
+}
+

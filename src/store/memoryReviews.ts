@@ -87,3 +87,8 @@ export function memoryCalculateAverageRating(propertyId: string) {
   return Math.round((sum / items.length) * 10) / 10 // 1 decimal
 }
 
+/** Solo para uso en seed de desarrollo. Vacía todas las reviews. */
+export function memoryResetForDev() {
+  reviewsById.clear()
+}
+

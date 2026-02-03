@@ -11,6 +11,7 @@ exports.memoryDeleteUser = memoryDeleteUser;
 exports.memorySetResetPasswordToken = memorySetResetPasswordToken;
 exports.memoryFindUserByValidResetToken = memoryFindUserByValidResetToken;
 exports.memoryResetPassword = memoryResetPassword;
+exports.memoryResetForDev = memoryResetForDev;
 const crypto_1 = __importDefault(require("crypto"));
 const usersById = new Map();
 const usersByEmail = new Map(); // email -> id
@@ -94,5 +95,10 @@ function memoryResetPassword(userId, newPasswordHash) {
     user.passwordHash = newPasswordHash;
     delete user.resetPasswordTokenHash;
     delete user.resetPasswordExpiresAt;
+}
+/** Solo para uso en seed de desarrollo. Vacía todos los usuarios. */
+function memoryResetForDev() {
+    usersById.clear();
+    usersByEmail.clear();
 }
 //# sourceMappingURL=memoryUsers.js.map

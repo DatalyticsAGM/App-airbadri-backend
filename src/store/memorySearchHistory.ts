@@ -35,3 +35,8 @@ export function memoryAddSearchHistory(userId: string, entry: Omit<SearchHistory
 export function memoryClearSearchHistory(userId: string) {
   historyByUser.set(userId, [])
 }
+
+/** Solo para uso en seed de desarrollo. Vacía todo el historial de búsquedas. */
+export function memoryResetForDev() {
+  historyByUser.clear()
+}

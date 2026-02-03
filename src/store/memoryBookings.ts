@@ -64,3 +64,8 @@ export function memoryDeleteBookingsByProperty(propertyId: string) {
   return removed
 }
 
+/** Solo para uso en seed de desarrollo. Vacía todas las reservas. */
+export function memoryResetForDev() {
+  bookingsById.clear()
+}
+

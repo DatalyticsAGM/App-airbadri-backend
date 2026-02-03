@@ -3,7 +3,14 @@ import cors from 'cors'
 
 import { env } from './config/env'
 import { registerRoutes } from './routes'
+import { devRoutes } from './routes/dev.routes'
 import { errorHandler } from './middlewares/errorHandler'
+
+const API_VERSION = '1.0.0'
+
+function isDevMode() {
+  return env.USE_MEMORY_ONLY || process.env.NODE_ENV === 'development'
+}
 
 export function createApp() {
   const app = express()
@@ -22,7 +29,7 @@ export function createApp() {
   app.get('/', (_req, res) => {
     res.json({
       message: '🚀 Airbnb Backend API funcionando',
-      version: '1.0.0',
+      version: API_VERSION,
       endpoints: {
         auth: '/api/auth',
         users: '/api/users',
@@ -41,6 +48,14 @@ export function createApp() {
     })
   })
 
+  app.get('/api/info', (_req, res) => {
+    res.json({
+      version: API_VERSION,
+      memoryOnly: env.USE_MEMORY_ONLY,
+      env: process.env.NODE_ENV === 'production' ? 'production' : 'development',
+    })
+  })
+
   app.get('/health', (_req, res) => {
     res.json({ ok: true })
   })
@@ -50,6 +65,10 @@ export function createApp() {
   })
 
   registerRoutes(app)
+
+  if (isDevMode()) {
+    app.use('/api/dev', devRoutes())
+  }
 
   // 404 simple
   app.use((_req, res) => {

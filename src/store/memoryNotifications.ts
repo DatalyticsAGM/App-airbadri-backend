@@ -64,3 +64,8 @@ export function memoryGetUnreadCount(userId: string) {
   return memoryGetNotificationsByUser(userId).filter((n) => !n.read).length
 }
 
+/** Solo para uso en seed de desarrollo. Vacía todas las notificaciones. */
+export function memoryResetForDev() {
+  notificationsById.clear()
+}
+
