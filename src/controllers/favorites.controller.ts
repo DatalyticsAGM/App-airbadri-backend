@@ -11,25 +11,28 @@ function requireUserId(req: Request) {
 
 export async function listMyFavoritesHandler(req: Request, res: Response) {
   const userId = requireUserId(req)
-  res.json({ items: getFavoritesByUser(userId) })
+  const items = await getFavoritesByUser(userId)
+  res.json({ items })
 }
 
 export async function addFavoriteHandler(req: Request, res: Response) {
   const userId = requireUserId(req)
   const propertyId = String(req.body?.propertyId || '').trim()
-  const fav = addFavorite(userId, propertyId)
+  const fav = await addFavorite(userId, propertyId)
   res.status(201).json(fav)
 }
 
 export async function removeFavoriteHandler(req: Request, res: Response) {
   const userId = requireUserId(req)
   const propertyId = String(req.params?.propertyId || '').trim()
-  res.json(removeFavorite(userId, propertyId))
+  const result = await removeFavorite(userId, propertyId)
+  res.json(result)
 }
 
 export async function isFavoriteHandler(req: Request, res: Response) {
   const userId = requireUserId(req)
   const propertyId = String(req.params?.propertyId || '').trim()
-  res.json(isFavorite(userId, propertyId))
+  const result = await isFavorite(userId, propertyId)
+  res.json(result)
 }
 

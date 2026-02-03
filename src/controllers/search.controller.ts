@@ -1,12 +1,7 @@
 import type { Request, Response } from 'express'
 
 import { httpError } from '../middlewares/errorHandler'
-import { memoryListProperties } from '../store/memoryProperties'
-import {
-  memoryAddSearchHistory,
-  memoryClearSearchHistory,
-  memoryGetSearchHistory,
-} from '../store/memorySearchHistory'
+import { propertyRepository, searchHistoryRepository } from '../repositories'
 
 const SUGGESTIONS_LIMIT = 15
 
@@ -18,7 +13,7 @@ function requireUserId(req: Request) {
 
 export async function getSuggestionsHandler(req: Request, res: Response) {
   const q = String(req.query?.q || '').trim().toLowerCase()
-  const properties = memoryListProperties()
+  const properties = await propertyRepository.list()
   const locations = new Set<string>()
   for (const p of properties) {
     if (p.location && (!q || p.location.toLowerCase().includes(q))) {
@@ -33,7 +28,7 @@ export async function getSuggestionsHandler(req: Request, res: Response) {
 
 export async function getSearchHistoryHandler(req: Request, res: Response) {
   const userId = requireUserId(req)
-  const items = memoryGetSearchHistory(userId)
+  const items = await searchHistoryRepository.get(userId)
   res.json({ items })
 }
 
@@ -48,12 +43,12 @@ export async function postSearchHistoryHandler(req: Request, res: Response) {
     checkIn: typeof body.checkIn === 'string' ? body.checkIn.trim() : undefined,
     checkOut: typeof body.checkOut === 'string' ? body.checkOut.trim() : undefined,
   }
-  memoryAddSearchHistory(userId, entry)
-  res.status(201).json({ ok: true, items: memoryGetSearchHistory(userId) })
+  const items = await searchHistoryRepository.add(userId, entry)
+  res.status(201).json({ ok: true, items })
 }
 
 export async function deleteSearchHistoryHandler(req: Request, res: Response) {
   const userId = requireUserId(req)
-  memoryClearSearchHistory(userId)
+  await searchHistoryRepository.clear(userId)
   res.json({ ok: true })
 }

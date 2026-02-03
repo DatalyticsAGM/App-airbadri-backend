@@ -1,5 +1,6 @@
 import express from 'express'
 import cors from 'cors'
+import mongoose from 'mongoose'
 
 import { env } from './config/env'
 import { registerRoutes } from './routes'
@@ -61,7 +62,13 @@ export function createApp() {
   })
 
   app.get('/ready', (_req, res) => {
-    res.json({ ok: true, ready: true })
+    const mongoConnected = mongoose.connection.readyState === 1
+    const memoryOnly = env.USE_MEMORY_ONLY
+    res.json({
+      ok: true,
+      ready: memoryOnly || mongoConnected,
+      ...(memoryOnly ? {} : { mongo: mongoConnected ? 'connected' : 'disconnected' }),
+    })
   })
 
   registerRoutes(app)

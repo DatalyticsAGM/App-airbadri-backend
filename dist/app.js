@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.createApp = createApp;
 const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
+const mongoose_1 = __importDefault(require("mongoose"));
 const env_1 = require("./config/env");
 const routes_1 = require("./routes");
 const dev_routes_1 = require("./routes/dev.routes");
@@ -55,7 +56,13 @@ function createApp() {
         res.json({ ok: true });
     });
     app.get('/ready', (_req, res) => {
-        res.json({ ok: true, ready: true });
+        const mongoConnected = mongoose_1.default.connection.readyState === 1;
+        const memoryOnly = env_1.env.USE_MEMORY_ONLY;
+        res.json({
+            ok: true,
+            ready: memoryOnly || mongoConnected,
+            ...(memoryOnly ? {} : { mongo: mongoConnected ? 'connected' : 'disconnected' }),
+        });
     });
     (0, routes_1.registerRoutes)(app);
     if (isDevMode()) {

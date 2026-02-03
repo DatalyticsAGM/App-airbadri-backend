@@ -70,7 +70,7 @@ export async function listPropertiesHandler(req: Request, res: Response) {
   const sort = String(req.query?.sort || '').trim()
   if (sort) filters.sort = sort as any
 
-  const result = listProperties(filters)
+  const result = await listProperties(filters)
   res.json(result)
 }
 
@@ -78,7 +78,7 @@ export async function getPropertyHandler(req: Request, res: Response) {
   const id = String(req.params?.id || '').trim()
   if (!id) throw httpError(400, 'VALIDATION_ERROR', 'id is required')
 
-  const property = getPropertyByIdOrThrow(id)
+  const property = await getPropertyByIdOrThrow(id)
   res.json(property)
 }
 
@@ -86,7 +86,7 @@ export async function getAvailabilityHandler(req: Request, res: Response) {
   const id = String(req.params?.id || '').trim()
   if (!id) throw httpError(400, 'VALIDATION_ERROR', 'id is required')
 
-  getPropertyByIdOrThrow(id)
+  await getPropertyByIdOrThrow(id)
 
   const checkIn = String(req.query?.checkIn || '').trim()
   const checkOut = String(req.query?.checkOut || '').trim()
@@ -94,7 +94,7 @@ export async function getAvailabilityHandler(req: Request, res: Response) {
     throw httpError(400, 'VALIDATION_ERROR', 'checkIn and checkOut are required')
   }
 
-  const available = isPropertyAvailable(id, checkIn, checkOut)
+  const available = await isPropertyAvailable(id, checkIn, checkOut)
   res.json({ available })
 }
 
@@ -109,7 +109,7 @@ export async function getBookingPreviewHandler(req: Request, res: Response) {
     throw httpError(400, 'VALIDATION_ERROR', 'checkIn and checkOut are required')
   }
 
-  const preview = getBookingPreview(id, checkIn, checkOut, guests)
+  const preview = await getBookingPreview(id, checkIn, checkOut, guests)
   res.json(preview)
 }
 
@@ -117,7 +117,8 @@ export async function listMineHandler(req: Request, res: Response) {
   const hostId = String((req as any).userId || '')
   if (!hostId) throw httpError(401, 'UNAUTHORIZED', 'Unauthorized')
 
-  res.json({ items: listMyProperties(hostId) })
+  const items = await listMyProperties(hostId)
+  res.json({ items })
 }
 
 export async function createPropertyHandler(req: Request, res: Response) {
@@ -131,7 +132,7 @@ export async function createPropertyHandler(req: Request, res: Response) {
   const images = Array.isArray(req.body?.images) ? req.body.images : []
   const amenities = Array.isArray(req.body?.amenities) ? req.body.amenities : []
 
-  const property = createProperty(hostId, {
+  const property = await createProperty(hostId, {
     title,
     description,
     location,
@@ -154,7 +155,7 @@ export async function updatePropertyHandler(req: Request, res: Response) {
   const id = String(req.params?.id || '').trim()
   if (!id) throw httpError(400, 'VALIDATION_ERROR', 'id is required')
 
-  const updated = updateProperty(hostId, id, req.body || {})
+  const updated = await updateProperty(hostId, id, req.body || {})
 
   res.json(updated)
 }

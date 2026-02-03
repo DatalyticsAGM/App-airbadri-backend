@@ -17,12 +17,14 @@ function requireUserId(req: Request) {
 
 export async function listMyNotificationsHandler(req: Request, res: Response) {
   const userId = requireUserId(req)
-  res.json({ items: getMyNotifications(userId) })
+  const items = await getMyNotifications(userId)
+  res.json({ items })
 }
 
 export async function unreadCountHandler(req: Request, res: Response) {
   const userId = requireUserId(req)
-  res.json({ unread: getUnreadCount(userId) })
+  const unread = await getUnreadCount(userId)
+  res.json({ unread })
 }
 
 export async function markAsReadHandler(req: Request, res: Response) {
@@ -34,7 +36,8 @@ export async function markAsReadHandler(req: Request, res: Response) {
 
 export async function markAllAsReadHandler(req: Request, res: Response) {
   const userId = requireUserId(req)
-  res.json(markAllAsRead(userId))
+  const result = await markAllAsRead(userId)
+  res.json(result)
 }
 
 // Endpoint MOCK útil para testing manual (crear notificación “a mano”).
@@ -45,7 +48,7 @@ export async function createMyNotificationHandler(req: Request, res: Response) {
   const message = String(req.body?.message || '')
   const link = req.body?.link ? String(req.body.link) : undefined
 
-  const n = createNotification({ userId, type, title, message, link })
+  const n = await createNotification({ userId, type, title, message, link })
   res.status(201).json(n)
 }
 

@@ -18,7 +18,8 @@ export async function listPropertyReviewsHandler(req: Request, res: Response) {
   const propertyId = String(req.params?.id || '').trim()
   if (!propertyId) throw httpError(400, 'VALIDATION_ERROR', 'propertyId is required')
 
-  res.json(listReviewsByProperty(propertyId))
+  const result = await listReviewsByProperty(propertyId)
+  res.json(result)
 }
 
 export async function createPropertyReviewHandler(req: Request, res: Response) {
@@ -47,7 +48,7 @@ export async function deleteReviewHandler(req: Request, res: Response) {
   const id = String(req.params?.id || '').trim()
   if (!id) throw httpError(400, 'VALIDATION_ERROR', 'id is required')
 
-  deleteReview(userId, id)
+  await deleteReview(userId, id)
   res.json({ ok: true })
 }
 

@@ -1,11 +1,10 @@
 import type { Request, Response } from 'express'
 
 import { httpError } from '../middlewares/errorHandler'
-import { memoryListBookings } from '../store/memoryBookings'
-import { memoryListPropertiesByHost } from '../store/memoryProperties'
-import { memoryListReviewsByProperty } from '../store/memoryReviews'
+import { listMyProperties } from '../services/properties.service'
+import { listBookingsByProperty, normalizeBookingStatus } from '../services/bookings.service'
+import { listReviewsByProperty } from '../services/reviews.service'
 import { getMyNotifications, getUnreadCount } from '../services/notifications.service'
-import { normalizeBookingStatus } from '../services/bookings.service'
 
 function requireUserId(req: Request) {
   const userId = String((req as any).userId || '')
@@ -16,35 +15,35 @@ function requireUserId(req: Request) {
 export async function hostDashboardHandler(req: Request, res: Response) {
   const hostId = requireUserId(req)
 
-  const properties = memoryListPropertiesByHost(hostId)
+  const properties = await listMyProperties(hostId)
   const propertyIds = new Set(properties.map((p) => p.id))
 
-  const allBookings = memoryListBookings()
-  const hostBookings = allBookings
-    .filter((b) => propertyIds.has(b.propertyId))
+  const allBookingsArrays = await Promise.all(properties.map((p) => listBookingsByProperty(p.id)))
+  const hostBookings = allBookingsArrays
+    .flat()
     .map((b) => ({ ...b, status: normalizeBookingStatus(b) }))
     .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
 
-  const bookingsCount = hostBookings.length
-  const earningsTotal = hostBookings
-    .filter((b) => b.status !== 'cancelled')
-    .reduce((acc, b) => acc + (Number(b.totalPrice) || 0), 0)
-
-  const reviews = properties.flatMap((p) => memoryListReviewsByProperty(p.id))
+  const reviewsArrays = await Promise.all(properties.map((p) => listReviewsByProperty(p.id)))
+  const reviews = reviewsArrays.flatMap((r) => r.items)
   const reviewsCount = reviews.length
   const averageRating =
     reviewsCount === 0 ? 0 : Math.round((reviews.reduce((acc, r) => acc + r.rating, 0) / reviewsCount) * 10) / 10
 
-  const notifications = getMyNotifications(hostId)
-  const unreadNotifications = getUnreadCount(hostId)
+  const [notifications, unreadNotifications] = await Promise.all([
+    getMyNotifications(hostId),
+    getUnreadCount(hostId),
+  ])
 
   res.json({
     stats: {
       propertiesCount: properties.length,
-      bookingsCount,
+      bookingsCount: hostBookings.length,
       reviewsCount,
       averageRating,
-      earningsTotal,
+      earningsTotal: hostBookings
+        .filter((b) => b.status !== 'cancelled')
+        .reduce((acc, b) => acc + (Number(b.totalPrice) || 0), 0),
       unreadNotifications,
     },
     recentBookings: hostBookings.slice(0, 5),
@@ -55,4 +54,3 @@ export async function hostDashboardHandler(req: Request, res: Response) {
     notifications: notifications.slice(0, 10),
   })
 }
-

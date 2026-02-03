@@ -10,8 +10,8 @@ import {
   toPublicUser,
   updateUserProfile,
 } from '../services/auth.service'
-import { memoryListBookingsByUser } from '../store/memoryBookings'
-import { memoryListPropertiesByHost } from '../store/memoryProperties'
+import { listMyProperties } from '../services/properties.service'
+import { listMyBookings } from '../services/bookings.service'
 
 export async function getMe(req: Request, res: Response) {
   const userId = String((req as any).userId || '')
@@ -20,9 +20,10 @@ export async function getMe(req: Request, res: Response) {
   const user = await findUserById(userId)
   if (!user) throw httpError(401, 'UNAUTHORIZED', 'Unauthorized')
 
+  const [properties, bookings] = await Promise.all([listMyProperties(userId), listMyBookings(userId)])
   const stats = {
-    propertiesCount: memoryListPropertiesByHost(userId).length,
-    bookingsCount: memoryListBookingsByUser(userId).length,
+    propertiesCount: properties.length,
+    bookingsCount: bookings.length,
   }
 
   res.json({ user: toPublicUser(user), stats })

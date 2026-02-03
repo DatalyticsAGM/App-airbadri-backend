@@ -17,7 +17,8 @@ function requireUserId(req: Request) {
 
 export async function listMyBookingsHandler(req: Request, res: Response) {
   const userId = requireUserId(req)
-  const items = listMyBookings(userId).map((b) => ({ ...b, status: normalizeBookingStatus(b) }))
+  const list = await listMyBookings(userId)
+  const items = list.map((b) => ({ ...b, status: normalizeBookingStatus(b) }))
   res.json({ items })
 }
 
@@ -29,12 +30,12 @@ export async function getMyBookingHandler(req: Request, res: Response) {
   const include = String(req.query?.include || '').trim().toLowerCase()
   const withProperty = include === 'property'
 
-  const booking = getMyBookingByIdOrThrow(userId, id)
+  const booking = await getMyBookingByIdOrThrow(userId, id)
   const payload: Record<string, unknown> = { ...booking, status: normalizeBookingStatus(booking) }
   if (withProperty) {
     const { getPropertyByIdOrThrow } = await import('../services/properties.service')
     try {
-      payload.property = getPropertyByIdOrThrow(booking.propertyId)
+      payload.property = await getPropertyByIdOrThrow(booking.propertyId)
     } catch {
       payload.property = null
     }
@@ -50,7 +51,7 @@ export async function createBookingHandler(req: Request, res: Response) {
   const checkOut = String(req.body?.checkOut || '').trim()
   const guests = Number(req.body?.guests)
 
-  const booking = createBooking(userId, { propertyId, checkIn, checkOut, guests })
+  const booking = await createBooking(userId, { propertyId, checkIn, checkOut, guests })
   res.status(201).json({ ...booking, status: normalizeBookingStatus(booking) })
 }
 
@@ -64,7 +65,7 @@ export async function patchBookingHandler(req: Request, res: Response) {
     throw httpError(400, 'VALIDATION_ERROR', 'Only status=cancelled is supported')
   }
 
-  const updated = cancelMyBooking(userId, id)
+  const updated = await cancelMyBooking(userId, id)
   res.json({ ...updated, status: normalizeBookingStatus(updated) })
 }
 
