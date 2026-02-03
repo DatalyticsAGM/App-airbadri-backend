@@ -1,5 +1,7 @@
 # API REST — Documentación para integración (Mocks 100%)
 
+**Documentación ampliada con ejemplos y colección Postman:** [API-REFERENCE.md](./API-REFERENCE.md) · Postman: [postman/Airbnb-Backend-API.postman_collection.json](./postman/Airbnb-Backend-API.postman_collection.json)
+
 Base URL: `http://localhost:3333` (o la configurada en `PORT`).
 
 Formato de errores: `{ "error": { "code": "CODIGO", "message": "..." } }`.  
@@ -47,6 +49,7 @@ Códigos comunes: `400` (validación), `401` (no autenticado), `403` (no autoriz
 |--------|-----------------|--------|-------------|
 | GET    | /api/users/me   | Bearer | Perfil + stats. 200: `{ "user", "stats": { "propertiesCount", "bookingsCount" } }`. |
 | PATCH  | /api/users/me  | Bearer | Actualizar perfil. Body: `{ "fullName"?, "email"?, "avatarUrl"? }`. |
+| DELETE | /api/users/me  | Bearer | Eliminar cuenta. 200: `{ "ok": true }`. |
 
 ---
 
@@ -104,8 +107,9 @@ Códigos comunes: `400` (validación), `401` (no autenticado), `403` (no autoriz
 |--------|----------------------------------|--------|-------------|
 | GET    | /api/notifications              | Bearer | Lista. 200: `{ "items" }`. |
 | GET    | /api/notifications/unread-count | Bearer | 200: `{ "unread": number }`. |
-| POST   | /api/notifications/read-all     | Bearer | Marcar todas leídas. |
-| PATCH  | /api/notifications/:id/read     | Bearer | Marcar una leída. |
+| POST   | /api/notifications              | Bearer | Crear notificación (mock). Body: `{ "type"?, "title"?, "message"?, "link"? }`. 201. |
+| POST   | /api/notifications/read-all     | Bearer | Marcar todas leídas. 200: `{ "ok": true, "count" }`. |
+| PATCH  | /api/notifications/:id/read     | Bearer | Marcar una leída. 200: notificación. |
 
 ---
 

@@ -1,0 +1,642 @@
+{
+  "info": {
+    "name": "Airbnb Backend API",
+    "description": "Colección de todos los endpoints del backend Airbnb. Base URL y token configurables. Tras ejecutar Login o Signup, el accessToken se guarda automáticamente para el resto de peticiones. Documentación: doks/backend/API-REFERENCE.md",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3333" },
+    { "key": "accessToken", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Health & Info",
+      "item": [
+        {
+          "name": "GET /",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/",
+            "description": "Resumen de la API y lista de endpoints."
+          }
+        },
+        {
+          "name": "GET /health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/health",
+            "description": "Liveness."
+          }
+        },
+        {
+          "name": "GET /ready",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/ready",
+            "description": "Readiness."
+          }
+        },
+        {
+          "name": "GET /api/info",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/info",
+            "description": "Versión y modo (memoryOnly, env)."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Dev",
+      "item": [
+        {
+          "name": "POST /api/dev/seed",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/api/dev/seed",
+            "description": "Resetea stores in-memory y crea datos de ejemplo. Solo en desarrollo."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Signup",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": ["var json = pm.response.json(); if (json.accessToken) { pm.collectionVariables.set('accessToken', json.accessToken); }"],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"María García\",\n  \"email\": \"maria@example.com\",\n  \"password\": \"secret123\"\n}"
+            },
+            "url": "{{baseUrl}}/api/auth/signup",
+            "description": "Registro. Guarda accessToken en variable de colección."
+          }
+        },
+        {
+          "name": "Register (alias Signup)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": ["var json = pm.response.json(); if (json.accessToken) { pm.collectionVariables.set('accessToken', json.accessToken); }"],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"María García\",\n  \"email\": \"maria@example.com\",\n  \"password\": \"secret123\"\n}"
+            },
+            "url": "{{baseUrl}}/api/auth/register",
+            "description": "Alias de signup."
+          }
+        },
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": ["var json = pm.response.json(); if (json.accessToken) { pm.collectionVariables.set('accessToken', json.accessToken); }"],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"maria@example.com\",\n  \"password\": \"secret123\"\n}"
+            },
+            "url": "{{baseUrl}}/api/auth/login",
+            "description": "Login. Guarda accessToken en variable de colección."
+          }
+        },
+        {
+          "name": "GET /api/auth/me",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": "{{baseUrl}}/api/auth/me",
+            "description": "Usuario actual (Bearer)."
+          }
+        },
+        {
+          "name": "GET /api/auth/verify",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": "{{baseUrl}}/api/auth/verify",
+            "description": "Alias de me."
+          }
+        },
+        {
+          "name": "POST /api/auth/logout",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": "{{baseUrl}}/api/auth/logout",
+            "description": "Cierra sesión (stateless)."
+          }
+        },
+        {
+          "name": "POST /api/auth/forgot-password",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"maria@example.com\"\n}"
+            },
+            "url": "{{baseUrl}}/api/auth/forgot-password",
+            "description": "Solicitar reset. En dev devuelve resetToken."
+          }
+        },
+        {
+          "name": "GET /api/auth/reset-password/validate",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/auth/reset-password/validate?token=TU_TOKEN_AQUI",
+            "description": "Validar token de reset. Query: token."
+          }
+        },
+        {
+          "name": "POST /api/auth/reset-password",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"token\": \"TU_TOKEN_AQUI\",\n  \"password\": \"nuevaPassword123\"\n}"
+            },
+            "url": "{{baseUrl}}/api/auth/reset-password",
+            "description": "Restablecer contraseña con token."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "GET /api/users/me",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": "{{baseUrl}}/api/users/me",
+            "description": "Perfil y stats (propertiesCount, bookingsCount)."
+          }
+        },
+        {
+          "name": "PATCH /api/users/me",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"María García Actualizada\",\n  \"avatarUrl\": \"https://example.com/avatar.jpg\"\n}"
+            },
+            "url": "{{baseUrl}}/api/users/me",
+            "description": "Actualizar perfil. Campos opcionales: fullName, email, avatarUrl (al menos uno)."
+          }
+        },
+        {
+          "name": "DELETE /api/users/me",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": "{{baseUrl}}/api/users/me",
+            "description": "Eliminar cuenta del usuario actual."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Properties",
+      "item": [
+        {
+          "name": "GET /api/properties (list)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/properties?location=Barcelona&minPrice=50&maxPrice=150&page=1&limit=10&sort=price_asc",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "properties"],
+              "query": [
+                { "key": "q", "value": "", "disabled": true },
+                { "key": "location", "value": "Barcelona" },
+                { "key": "minPrice", "value": "50" },
+                { "key": "maxPrice", "value": "150" },
+                { "key": "amenities", "value": "wifi,parking", "disabled": true },
+                { "key": "minRating", "value": "", "disabled": true },
+                { "key": "checkIn", "value": "", "disabled": true },
+                { "key": "checkOut", "value": "", "disabled": true },
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "10" },
+                { "key": "sort", "value": "price_asc" }
+              ]
+            },
+            "description": "Catálogo con filtros. sort: price_asc, price_desc, rating_desc, newest, relevance."
+          }
+        },
+        {
+          "name": "GET /api/properties/mine",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": "{{baseUrl}}/api/properties/mine",
+            "description": "Mis propiedades (host)."
+          }
+        },
+        {
+          "name": "GET /api/properties/:id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/properties/:id",
+            "description": "Detalle de propiedad. Reemplazar :id por ID real."
+          }
+        },
+        {
+          "name": "GET /api/properties/:id/availability",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/properties/:id/availability?checkIn=2025-02-10&checkOut=2025-02-13",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "properties", ":id", "availability"],
+              "query": [
+                { "key": "checkIn", "value": "2025-02-10" },
+                { "key": "checkOut", "value": "2025-02-13" }
+              ]
+            },
+            "description": "Disponibilidad. Query: checkIn, checkOut (YYYY-MM-DD)."
+          }
+        },
+        {
+          "name": "GET /api/properties/:id/booking-preview",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/properties/:id/booking-preview?checkIn=2025-02-10&checkOut=2025-02-13&guests=2",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "properties", ":id", "booking-preview"],
+              "query": [
+                { "key": "checkIn", "value": "2025-02-10" },
+                { "key": "checkOut", "value": "2025-02-13" },
+                { "key": "guests", "value": "2" }
+              ]
+            },
+            "description": "Vista previa de reserva: available, pricePerNight, nights, totalPrice."
+          }
+        },
+        {
+          "name": "GET /api/properties/:id/reviews",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/properties/:id/reviews",
+            "description": "Reviews de la propiedad (items, averageRating, total)."
+          }
+        },
+        {
+          "name": "POST /api/properties",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Apartamento céntrico\",\n  \"description\": \"Muy luminoso, cerca del metro.\",\n  \"location\": \"Madrid\",\n  \"pricePerNight\": 70,\n  \"images\": [\"https://example.com/1.jpg\"],\n  \"amenities\": [\"wifi\", \"kitchen\"],\n  \"maxGuests\": 4\n}"
+            },
+            "url": "{{baseUrl}}/api/properties",
+            "description": "Crear propiedad. Obligatorios: title, description, location, pricePerNight."
+          }
+        },
+        {
+          "name": "POST /api/properties/:id/reviews",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"rating\": 5,\n  \"comment\": \"Excelente estancia, muy recomendable.\"\n}"
+            },
+            "url": "{{baseUrl}}/api/properties/:id/reviews",
+            "description": "Crear review (requiere reserva completada). rating 1-5, comment obligatorio."
+          }
+        },
+        {
+          "name": "PATCH /api/properties/:id",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Nuevo título\",\n  \"pricePerNight\": 80\n}"
+            },
+            "url": "{{baseUrl}}/api/properties/:id",
+            "description": "Actualizar propiedad (solo dueño)."
+          }
+        },
+        {
+          "name": "DELETE /api/properties/:id",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": "{{baseUrl}}/api/properties/:id",
+            "description": "Eliminar propiedad (solo dueño). 204."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Bookings",
+      "item": [
+        {
+          "name": "GET /api/bookings",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": "{{baseUrl}}/api/bookings",
+            "description": "Mis reservas."
+          }
+        },
+        {
+          "name": "GET /api/bookings/:id",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": "{{baseUrl}}/api/bookings/:id?include=property",
+            "description": "Detalle reserva. Query include=property para incluir propiedad."
+          }
+        },
+        {
+          "name": "POST /api/bookings",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"propertyId\": \"prop_xxx\",\n  \"checkIn\": \"2025-02-10\",\n  \"checkOut\": \"2025-02-13\",\n  \"guests\": 2\n}"
+            },
+            "url": "{{baseUrl}}/api/bookings",
+            "description": "Crear reserva. Reemplazar propertyId por ID real."
+          }
+        },
+        {
+          "name": "PATCH /api/bookings/:id (cancel)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"cancelled\"\n}"
+            },
+            "url": "{{baseUrl}}/api/bookings/:id",
+            "description": "Cancelar reserva. Solo status=cancelled permitido."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Reviews",
+      "item": [
+        {
+          "name": "PATCH /api/reviews/:id",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"rating\": 4,\n  \"comment\": \"Comentario actualizado.\"\n}"
+            },
+            "url": "{{baseUrl}}/api/reviews/:id",
+            "description": "Editar review (solo autor)."
+          }
+        },
+        {
+          "name": "DELETE /api/reviews/:id",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": "{{baseUrl}}/api/reviews/:id",
+            "description": "Borrar review (solo autor)."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Favorites",
+      "item": [
+        {
+          "name": "GET /api/favorites",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": "{{baseUrl}}/api/favorites",
+            "description": "Lista de favoritos."
+          }
+        },
+        {
+          "name": "POST /api/favorites",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"propertyId\": \"prop_xxx\"\n}"
+            },
+            "url": "{{baseUrl}}/api/favorites",
+            "description": "Añadir favorito. Idempotente."
+          }
+        },
+        {
+          "name": "GET /api/favorites/:propertyId",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": "{{baseUrl}}/api/favorites/:propertyId",
+            "description": "Comprobar si es favorito. Response: { favorite: boolean }."
+          }
+        },
+        {
+          "name": "DELETE /api/favorites/:propertyId",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": "{{baseUrl}}/api/favorites/:propertyId",
+            "description": "Quitar favorito."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Notifications",
+      "item": [
+        {
+          "name": "GET /api/notifications",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": "{{baseUrl}}/api/notifications",
+            "description": "Lista de notificaciones."
+          }
+        },
+        {
+          "name": "GET /api/notifications/unread-count",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": "{{baseUrl}}/api/notifications/unread-count",
+            "description": "Número de no leídas."
+          }
+        },
+        {
+          "name": "POST /api/notifications (create mock)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"info\",\n  \"title\": \"Nueva reserva\",\n  \"message\": \"Tienes una nueva reserva.\",\n  \"link\": \"/bookings/xxx\"\n}"
+            },
+            "url": "{{baseUrl}}/api/notifications",
+            "description": "Crear notificación (mock para testing)."
+          }
+        },
+        {
+          "name": "POST /api/notifications/read-all",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": "{{baseUrl}}/api/notifications/read-all",
+            "description": "Marcar todas como leídas."
+          }
+        },
+        {
+          "name": "PATCH /api/notifications/:id/read",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": "{{baseUrl}}/api/notifications/:id/read",
+            "description": "Marcar una notificación como leída."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Host",
+      "item": [
+        {
+          "name": "GET /api/host/dashboard",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": "{{baseUrl}}/api/host/dashboard",
+            "description": "Dashboard: stats, recentBookings, recentReviews, notifications."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Search",
+      "item": [
+        {
+          "name": "GET /api/search/suggestions",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/search/suggestions?q=bar",
+            "description": "Sugerencias de ubicaciones. Query: q."
+          }
+        },
+        {
+          "name": "GET /api/search/history",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": "{{baseUrl}}/api/search/history",
+            "description": "Historial de búsquedas del usuario."
+          }
+        },
+        {
+          "name": "POST /api/search/history",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"q\": \"playa\",\n  \"location\": \"Valencia\",\n  \"minPrice\": 50,\n  \"maxPrice\": 150,\n  \"checkIn\": \"2025-03-01\",\n  \"checkOut\": \"2025-03-05\"\n}"
+            },
+            "url": "{{baseUrl}}/api/search/history",
+            "description": "Guardar búsqueda en historial."
+          }
+        },
+        {
+          "name": "DELETE /api/search/history",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": "{{baseUrl}}/api/search/history",
+            "description": "Vaciar historial de búsquedas."
+          }
+        }
+      ]
+    }
+  ]
+}
