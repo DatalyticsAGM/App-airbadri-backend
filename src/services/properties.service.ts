@@ -1,3 +1,11 @@
+/**
+ * Módulo properties.service (servicio de propiedades).
+ *
+ * Lógica de negocio de propiedades: listado con filtros y paginación, CRUD por host,
+ * disponibilidad (usa bookings.service). Usa stores en memoria (memoryProperties, memoryBookings, memoryReviews).
+ * Dependencias: middlewares/errorHandler, store/memoryProperties, store/memoryBookings,
+ * store/memoryReviews, bookings.service.
+ */
 import { httpError } from '../middlewares/errorHandler'
 import {
   memoryCreateProperty,
@@ -13,6 +21,14 @@ import { memoryDeleteBookingsByProperty } from '../store/memoryBookings'
 import { isPropertyAvailable } from './bookings.service'
 import { memoryCalculateAverageRating } from '../store/memoryReviews'
 
+/**
+ * Resultado paginado del listado de propiedades.
+ *
+ * @property items - Lista de propiedades de la página actual.
+ * @property page - Número de página (1-based).
+ * @property limit - Tamaño de página.
+ * @property total - Total de elementos que cumplen el filtro (sin paginar).
+ */
 export type ListPropertiesResult = {
   items: Property[]
   page: number
@@ -20,8 +36,30 @@ export type ListPropertiesResult = {
   total: number
 }
 
+/**
+ * Criterios de ordenación del listado de propiedades.
+ * - price_asc / price_desc: por precio por noche.
+ * - rating_desc: por valoración media descendente.
+ * - newest: más recientes primero.
+ * - relevance: orden por defecto (tras aplicar búsqueda/filtros).
+ */
 export type PropertySort = 'price_asc' | 'price_desc' | 'rating_desc' | 'newest' | 'relevance'
 
+/**
+ * Filtros y opciones de listado de propiedades. Todos opcionales.
+ *
+ * @property q - Búsqueda por texto (título, descripción, ubicación).
+ * @property location - Filtro por ubicación.
+ * @property minPrice / maxPrice - Rango de precio por noche.
+ * @property amenities - Lista de comodidades requeridas (todas deben estar).
+ * @property propertyType - Tipo de propiedad.
+ * @property minRating - Valoración media mínima.
+ * @property checkIn / checkOut - Solo propiedades disponibles en ese rango (ambos requeridos juntos).
+ * @property minBedrooms / minBathrooms / minGuests - Mínimos numéricos.
+ * @property hostId - Solo propiedades de ese host.
+ * @property sort - Ordenación (PropertySort).
+ * @property page / limit - Paginación (page 1-based, limit por página).
+ */
 export type PropertyFilters = {
   q?: string
   location?: string
@@ -45,6 +83,16 @@ function clampInt(value: number, min: number, max: number) {
   return Math.max(min, Math.min(max, value))
 }
 
+/**
+ * Lista propiedades aplicando filtros, ordenación y paginación. La disponibilidad (checkIn/checkOut) usa bookings.service.
+ *
+ * @param filters - Objeto con filtros opcionales (q, location, precios, amenities, tipo, rating, fechas, hostId, sort, page, limit).
+ * @returns ListPropertiesResult con items, page, limit y total.
+ * @throws httpError 400 si minRating no es válido o si solo se pasa checkIn o checkOut (deben ir juntos).
+ *
+ * @example
+ * const result = listProperties({ q: 'playa', minPrice: 50, maxPrice: 150, page: 1, limit: 10 })
+ */
 export function listProperties(filters: PropertyFilters): ListPropertiesResult {
   const page = clampInt(filters.page ?? 1, 1, 10_000)
   const limit = clampInt(filters.limit ?? 20, 1, 100)
@@ -136,16 +184,37 @@ export function listProperties(filters: PropertyFilters): ListPropertiesResult {
   return { items: paged, page, limit, total }
 }
 
+/**
+ * Lista las propiedades creadas por un host.
+ *
+ * @param hostId - Id del host (usuario).
+ * @returns Lista de propiedades del store en memoria.
+ */
 export function listMyProperties(hostId: string) {
   return memoryListPropertiesByHost(hostId)
 }
 
+/**
+ * Obtiene una propiedad por id; si no existe lanza error 404.
+ *
+ * @param id - Id de la propiedad.
+ * @returns La propiedad.
+ * @throws httpError 404 si no existe.
+ */
 export function getPropertyByIdOrThrow(id: string) {
   const property = memoryGetPropertyById(id)
   if (!property) throw httpError(404, 'PROPERTY_NOT_FOUND', 'Property not found')
   return property
 }
 
+/**
+ * Crea una nueva propiedad asociada al host. Valida título, ubicación y precio.
+ *
+ * @param hostId - Id del host que crea la propiedad.
+ * @param input - title, description, location, pricePerNight, images, amenities y opcionales (propertyType, bedrooms, bathrooms, maxGuests).
+ * @returns La propiedad creada.
+ * @throws httpError 400 si title o location están vacíos o pricePerNight no es un número positivo.
+ */
 export function createProperty(hostId: string, input: {
   title: string
   description: string
@@ -188,6 +257,15 @@ export function createProperty(hostId: string, input: {
   })
 }
 
+/**
+ * Actualiza una propiedad. Solo el host dueño puede actualizarla. Aplica validaciones a los campos enviados.
+ *
+ * @param hostId - Id del host (debe coincidir con property.hostId).
+ * @param propertyId - Id de la propiedad.
+ * @param patch - Campos a actualizar (parcial: title, description, location, pricePerNight, images, amenities, etc.).
+ * @returns La propiedad actualizada.
+ * @throws httpError 403 si no es el host; 404 si no existe la propiedad; 400 por validación de campos.
+ */
 export function updateProperty(hostId: string, propertyId: string, patch: Partial<{
   title: string
   description: string
@@ -203,7 +281,8 @@ export function updateProperty(hostId: string, propertyId: string, patch: Partia
   const current = getPropertyByIdOrThrow(propertyId)
   if (current.hostId !== hostId) throw httpError(403, 'FORBIDDEN', 'Not allowed')
 
-  const next: Record<string, unknown> = { ...patch }
+  type PropertyPatch = Partial<Omit<Property, 'id' | 'hostId' | 'createdAt' | 'updatedAt'>>
+  const next: PropertyPatch = {}
 
   if (typeof patch.title === 'string') {
     const v = patch.title.trim()
@@ -239,11 +318,19 @@ export function updateProperty(hostId: string, propertyId: string, patch: Partia
     next.amenities = patch.amenities.map(String).map((s) => s.trim()).filter(Boolean)
   }
 
-  const updated = memoryUpdateProperty(propertyId, next as any)
+  const updated = memoryUpdateProperty(propertyId, next)
   if (!updated) throw httpError(404, 'PROPERTY_NOT_FOUND', 'Property not found')
   return updated
 }
 
+/**
+ * Elimina una propiedad. Solo el host dueño puede eliminarla. Borra también las reservas asociadas en memoria.
+ *
+ * @param hostId - Id del host (debe coincidir con property.hostId).
+ * @param propertyId - Id de la propiedad.
+ * @returns true si se eliminó correctamente.
+ * @throws httpError 403 si no es el host; 404 si no existe la propiedad.
+ */
 export function deleteProperty(hostId: string, propertyId: string) {
   const current = getPropertyByIdOrThrow(propertyId)
   if (current.hostId !== hostId) throw httpError(403, 'FORBIDDEN', 'Not allowed')

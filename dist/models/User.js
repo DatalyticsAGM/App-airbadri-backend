@@ -34,6 +34,13 @@ var __importStar = (this && this.__importStar) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.User = void 0;
+/**
+ * Módulo User (modelo).
+ *
+ * Define el esquema y el tipo del documento de usuario en la capa Model del MVC.
+ * Usado por rutas/controladores de auth y usuarios, y por el store en memoria cuando
+ * no hay conexión a MongoDB. Depende de mongoose para el esquema y el modelo.
+ */
 const mongoose_1 = __importStar(require("mongoose"));
 const userSchema = new mongoose_1.Schema({
     fullName: { type: String, required: true, trim: true },
@@ -42,5 +49,13 @@ const userSchema = new mongoose_1.Schema({
     resetPasswordTokenHash: { type: String, required: false },
     resetPasswordExpiresAt: { type: Date, required: false },
 }, { timestamps: true });
+/**
+ * Modelo de Mongoose para la colección de usuarios.
+ * Se usa en auth.service cuando la base de datos está disponible (isDbReady).
+ *
+ * @example
+ * const user = await User.findOne({ email: 'a@b.com' })
+ * const created = await User.create({ fullName: 'Juan', email: 'j@b.com', passwordHash: '...' })
+ */
 exports.User = mongoose_1.default.model('User', userSchema);
 //# sourceMappingURL=User.js.map

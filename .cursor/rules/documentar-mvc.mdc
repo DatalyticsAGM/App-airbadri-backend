@@ -1,0 +1,40 @@
+---
+description: Estándar de documentación para la capa MVC. Aplicar al crear o editar Models y Services: documentar con JSDoc (propósito del módulo, tipos exportados, parámetros, retornos, ejemplos). Referencia de estilo en src/models/User.ts. Servicios son módulos con funciones, no clases.
+globs: src/models/**/*.ts, src/services/**/*.ts
+alwaysApply: false
+---
+
+# Documentation standard: Models and Services (MVC)
+
+## Goal
+Document every file in the **Models** and **Services** layer so a junior developer can follow the code without guessing. Documentation must be clear, include detailed explanations of each exported type and function, and provide practical examples where helpful.
+
+## Scope
+- **Models**: all files under `src/models/` (e.g. Mongoose schemas, document types).
+- **Services**: all files under `src/services/` (business logic exposed as exported functions and types).
+
+## Style (reference)
+Match the style used for the `User` model in `src/models/User.ts`:
+- Plain language, no unnecessary jargon.
+- At the top of the file: short explanation of the **purpose** of the module.
+- For each **exported type/interface**: what it represents, what each property is for, and when it is used.
+- For each **exported function**: what it does, parameters, return value, and any errors it may throw.
+- Include **practical examples** (pseudo-code or real usage) where they clarify flow.
+- If a technical term is used (e.g. hash, token), explain it in one sentence.
+
+## Format
+- Use JSDoc comments (`/** ... */`) above types, interfaces, and functions.
+- Optionally: a short block at the top of each file summarizing the module’s role and how it fits in the MVC (routes, controllers, stores).
+
+## What to document per file
+1. **File header**: module name, one-sentence responsibility, and main dependencies (stores, other services, models).
+2. **Exported types/interfaces**: name, purpose, and a short description of each property.
+3. **Exported functions**: description, `@param` for each parameter, `@returns`, and if applicable `@throws` or a note on HTTP/business errors they may throw.
+4. **Examples**: at least one usage example for each “main” function (those called from controllers or other services).
+
+## Files in scope (current)
+- **Models**: `src/models/User.ts`
+- **Services**: `src/services/auth.service.ts`, `src/services/bookings.service.ts`, `src/services/favorites.service.ts`, `src/services/notifications.service.ts`, `src/services/properties.service.ts`, `src/services/reviews.service.ts`
+
+## Note
+Services in this project are **modules with functions** (functional style), not classes. Document each exported function and type; do not refer to “class methods.”

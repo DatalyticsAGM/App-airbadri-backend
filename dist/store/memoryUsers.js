@@ -13,11 +13,9 @@ exports.memoryFindUserByValidResetToken = memoryFindUserByValidResetToken;
 exports.memoryResetPassword = memoryResetPassword;
 exports.memoryResetForDev = memoryResetForDev;
 const crypto_1 = __importDefault(require("crypto"));
+const crypto_2 = require("../utils/crypto");
 const usersById = new Map();
 const usersByEmail = new Map(); // email -> id
-function sha256(input) {
-    return crypto_1.default.createHash('sha256').update(input).digest('hex');
-}
 function memoryCreateUser(params) {
     const id = crypto_1.default.randomUUID();
     const user = {
@@ -71,11 +69,11 @@ function memorySetResetPasswordToken(userId, token, expiresAt) {
     const user = usersById.get(userId);
     if (!user)
         return;
-    user.resetPasswordTokenHash = sha256(token);
+    user.resetPasswordTokenHash = (0, crypto_2.sha256)(token);
     user.resetPasswordExpiresAt = expiresAt;
 }
 function memoryFindUserByValidResetToken(token) {
-    const tokenHash = sha256(token);
+    const tokenHash = (0, crypto_2.sha256)(token);
     const now = Date.now();
     for (const user of usersById.values()) {
         if (!user.resetPasswordTokenHash || !user.resetPasswordExpiresAt)

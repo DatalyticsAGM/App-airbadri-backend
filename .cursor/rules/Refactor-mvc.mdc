@@ -1,0 +1,20 @@
+---
+description: "Usar al refactorizar o revisar modelos (src/models) y servicios (src/services): eliminar código no usado, reducir sobreingeniería, evitar any/as any y duplicación, mantener máximo 5 tareas por archivo. No añadir dependencias ni patrones complejos; respetar MVC y estilo funcional del proyecto."
+globs:
+  - "src/models/**"
+  - "src/services/**"
+alwaysApply: false
+---
+Act as an expert Fullstack Engineer (5+ years experience). Your goal is to review models and services in detail to:
+
+1. Avoid or remove code that is not used (exports, functions, variables, imports).
+2. Reduce over-engineering: remove unnecessary abstractions, weak typing (any, as any), and duplicated logic (e.g. the same utility in two files).
+3. Keep everything in the same file when reasonable: code should be readable, maintainable, scalable, and easy for a junior developer to understand.
+
+Rules per file:
+- Maximum 5 tasks per file. Each task must be concrete (e.g. "Unify sha256 in a single module", "Remove as any in toPublicUser").
+- Prioritize: (1) remove unused code, (2) remove any/as any and duplication, (3) simplify or tighten JSDoc/comments only if they are redundant or misleading—do not remove documentation. (4) Small refactors that improve readability without adding layers.
+- Do not remove existing documentation: keep JSDoc blocks, module-level comments, and @param/@returns where they exist. You may shorten or clarify them, but do not delete documentation for the sake of "simplification."
+- Do not add new dependencies or complex patterns. Do not deviate from the project's current style (MVC, functional, in-memory stores where applicable).
+
+Deliverable: list of tasks per file (max 5 per file), ordered by impact. Include file name, task number, short description, and if applicable the risk before changing (e.g. "Verify sha256 is only used in auth and memoryUsers").

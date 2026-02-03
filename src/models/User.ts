@@ -1,5 +1,25 @@
+/**
+ * Módulo User (modelo).
+ *
+ * Define el esquema y el tipo del documento de usuario en la capa Model del MVC.
+ * Usado por rutas/controladores de auth y usuarios, y por el store en memoria cuando
+ * no hay conexión a MongoDB. Depende de mongoose para el esquema y el modelo.
+ */
 import mongoose, { Schema } from 'mongoose'
 
+/**
+ * Tipo del documento de usuario tal como se persiste (MongoDB o representación equivalente).
+ * Contiene los datos sensibles (passwordHash) y los usados para reset de contraseña.
+ *
+ * @property _id - Identificador único del documento (ObjectId en MongoDB).
+ * @property fullName - Nombre completo del usuario.
+ * @property email - Correo electrónico (único, se guarda en minúsculas).
+ * @property passwordHash - Contraseña hasheada con bcrypt (nunca se devuelve en respuestas públicas).
+ * @property resetPasswordTokenHash - Hash del token de restablecimiento de contraseña, si existe.
+ * @property resetPasswordExpiresAt - Fecha de expiración del token de reset.
+ * @property createdAt - Fecha de creación (timestamps).
+ * @property updatedAt - Fecha de última actualización (timestamps).
+ */
 export type UserDoc = {
   _id: mongoose.Types.ObjectId
   fullName: string
@@ -22,5 +42,12 @@ const userSchema = new Schema<UserDoc>(
   { timestamps: true }
 )
 
+/**
+ * Modelo de Mongoose para la colección de usuarios.
+ * Se usa en auth.service cuando la base de datos está disponible (isDbReady).
+ *
+ * @example
+ * const user = await User.findOne({ email: 'a@b.com' })
+ * const created = await User.create({ fullName: 'Juan', email: 'j@b.com', passwordHash: '...' })
+ */
 export const User = mongoose.model<UserDoc>('User', userSchema)
-

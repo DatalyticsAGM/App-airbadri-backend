@@ -1,5 +1,7 @@
 import crypto from 'crypto'
 
+import { sha256 } from '../utils/crypto'
+
 export type MemoryUser = {
   id: string
   fullName: string
@@ -12,10 +14,6 @@ export type MemoryUser = {
 
 const usersById = new Map<string, MemoryUser>()
 const usersByEmail = new Map<string, string>() // email -> id
-
-function sha256(input: string) {
-  return crypto.createHash('sha256').update(input).digest('hex')
-}
 
 export function memoryCreateUser(params: {
   fullName: string
