@@ -7,8 +7,13 @@ import { assertEnv, env } from './config/env'
 async function main() {
   assertEnv()
   if (env.MONGO_URI && !env.USE_MEMORY_ONLY) {
-    await connectDb(env.MONGO_URI)
-  } else {
+    try {
+      await connectDb(env.MONGO_URI)
+    } catch (err) {
+      console.warn('No se pudo conectar a MongoDB; el servidor usará persistencia en memoria.', err)
+    }
+  }
+  if (!env.MONGO_URI || env.USE_MEMORY_ONLY) {
     console.log('Backend en modo MOCK: persistencia en memoria (sin MongoDB).')
   }
 

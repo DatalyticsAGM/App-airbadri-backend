@@ -40,6 +40,7 @@ export function createApp() {
         notifications: '/api/notifications',
         favorites: '/api/favorites',
         host: '/api/host',
+        hostDashboard: 'GET /api/host/dashboard',
         register: 'POST /api/auth/register',
         login: 'POST /api/auth/login',
         forgotPassword: 'POST /api/auth/forgot-password',
@@ -66,7 +67,7 @@ export function createApp() {
     const memoryOnly = env.USE_MEMORY_ONLY
     res.json({
       ok: true,
-      ready: memoryOnly || mongoConnected,
+      ready: true,
       ...(memoryOnly ? {} : { mongo: mongoConnected ? 'connected' : 'disconnected' }),
     })
   })

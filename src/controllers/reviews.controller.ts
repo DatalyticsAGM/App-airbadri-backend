@@ -39,7 +39,7 @@ export async function updateReviewHandler(req: Request, res: Response) {
   const id = String(req.params?.id || '').trim()
   if (!id) throw httpError(400, 'VALIDATION_ERROR', 'id is required')
 
-  const updated = updateReview(userId, id, { rating: req.body?.rating, comment: req.body?.comment })
+  const updated = await updateReview(userId, id, { rating: req.body?.rating, comment: req.body?.comment })
   res.json(updated)
 }
 

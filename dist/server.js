@@ -7,9 +7,14 @@ const env_1 = require("./config/env");
 async function main() {
     (0, env_1.assertEnv)();
     if (env_1.env.MONGO_URI && !env_1.env.USE_MEMORY_ONLY) {
-        await (0, db_1.connectDb)(env_1.env.MONGO_URI);
+        try {
+            await (0, db_1.connectDb)(env_1.env.MONGO_URI);
+        }
+        catch (err) {
+            console.warn('No se pudo conectar a MongoDB; el servidor usará persistencia en memoria.', err);
+        }
     }
-    else {
+    if (!env_1.env.MONGO_URI || env_1.env.USE_MEMORY_ONLY) {
         console.log('Backend en modo MOCK: persistencia en memoria (sin MongoDB).');
     }
     const app = (0, app_1.createApp)();
