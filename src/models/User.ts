@@ -2,8 +2,8 @@
  * Módulo User (modelo).
  *
  * Define el esquema y el tipo del documento de usuario en la capa Model del MVC.
- * Usado por rutas/controladores de auth y usuarios, y por el store en memoria cuando
- * no hay conexión a MongoDB. Depende de mongoose para el esquema y el modelo.
+ * Usado por repositories/mongo cuando la persistencia es MongoDB.
+ * El tipo UserDoc es solo interno (no se exporta).
  */
 import mongoose, { Schema } from 'mongoose'
 
@@ -20,7 +20,7 @@ import mongoose, { Schema } from 'mongoose'
  * @property createdAt - Fecha de creación (timestamps).
  * @property updatedAt - Fecha de última actualización (timestamps).
  */
-export type UserDoc = {
+type UserDoc = {
   _id: mongoose.Types.ObjectId
   fullName: string
   email: string
@@ -46,7 +46,7 @@ const userSchema = new Schema<UserDoc>(
 
 /**
  * Modelo de Mongoose para la colección de usuarios.
- * Se usa en auth.service cuando la base de datos está disponible (isDbReady).
+ * Se usa en repositories/mongo cuando la persistencia es MongoDB.
  *
  * @example
  * const user = await User.findOne({ email: 'a@b.com' })

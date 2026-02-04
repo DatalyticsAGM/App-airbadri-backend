@@ -31,7 +31,8 @@ export async function markAsReadHandler(req: Request, res: Response) {
   const userId = requireUserId(req)
   const id = String(req.params?.id || '').trim()
   if (!id) throw httpError(400, 'VALIDATION_ERROR', 'id is required')
-  res.json(markAsRead(userId, id))
+  const result = await markAsRead(userId, id)
+  res.json(result)
 }
 
 export async function markAllAsReadHandler(req: Request, res: Response) {

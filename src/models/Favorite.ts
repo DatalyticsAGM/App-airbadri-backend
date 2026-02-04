@@ -1,3 +1,6 @@
+/**
+ * Modelo Mongoose de favorito. Usado por repositories/mongo cuando la persistencia es MongoDB.
+ */
 import mongoose, { Schema } from 'mongoose'
 
 const favoriteSchema = new Schema(

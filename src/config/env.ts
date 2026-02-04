@@ -7,8 +7,10 @@ type Env = {
   FRONTEND_ORIGIN: string
 }
 
+const DEFAULT_PORT = 3333 // mismo que la colección Postman (localhost:3333)
+
 export const env: Env = {
-  PORT: parseInt(process.env.PORT || '3333', 10),
+  PORT: parseInt(process.env.PORT || String(DEFAULT_PORT), 10),
   MONGO_URI: process.env.MONGO_URI || '',
   USE_MEMORY_ONLY: process.env.USE_MEMORY_ONLY === 'true' || process.env.USE_MEMORY_ONLY === '1',
   JWT_SECRET: process.env.JWT_SECRET || '',

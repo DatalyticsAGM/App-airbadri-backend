@@ -38,8 +38,8 @@ exports.User = void 0;
  * Módulo User (modelo).
  *
  * Define el esquema y el tipo del documento de usuario en la capa Model del MVC.
- * Usado por rutas/controladores de auth y usuarios, y por el store en memoria cuando
- * no hay conexión a MongoDB. Depende de mongoose para el esquema y el modelo.
+ * Usado por repositories/mongo cuando la persistencia es MongoDB.
+ * El tipo UserDoc es solo interno (no se exporta).
  */
 const mongoose_1 = __importStar(require("mongoose"));
 const userSchema = new mongoose_1.Schema({
@@ -52,7 +52,7 @@ const userSchema = new mongoose_1.Schema({
 }, { timestamps: true });
 /**
  * Modelo de Mongoose para la colección de usuarios.
- * Se usa en auth.service cuando la base de datos está disponible (isDbReady).
+ * Se usa en repositories/mongo cuando la persistencia es MongoDB.
  *
  * @example
  * const user = await User.findOne({ email: 'a@b.com' })

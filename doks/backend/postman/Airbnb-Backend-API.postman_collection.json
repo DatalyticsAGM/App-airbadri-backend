@@ -1259,9 +1259,13 @@
               "script": {
                 "exec": [
                   "pm.test(\"Status 200\", function() { pm.response.to.have.status(200); });",
-                  "pm.test(\"Response has stats\", function() {",
+                  "pm.test(\"Response has stats, recentBookings, recentReviews, notifications\", function() {",
                   "    const j = pm.response.json();",
                   "    pm.expect(j).to.have.property('stats');",
+                  "    pm.expect(j).to.have.property('recentBookings');",
+                  "    pm.expect(j).to.have.property('recentReviews');",
+                  "    pm.expect(j).to.have.property('notifications');",
+                  "    pm.expect(j.stats).to.have.property('propertiesCount');",
                   "});"
                 ],
                 "type": "text/javascript"

@@ -1,3 +1,6 @@
+/**
+ * Modelo Mongoose de reseña. Usado por repositories/mongo cuando la persistencia es MongoDB.
+ */
 import mongoose, { Schema } from 'mongoose'
 
 const ratingDetailsSchema = new Schema(

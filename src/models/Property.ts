@@ -1,3 +1,6 @@
+/**
+ * Modelo Mongoose de propiedad. Usado por repositories/mongo cuando la persistencia es MongoDB.
+ */
 import mongoose, { Schema } from 'mongoose'
 
 const propertyTypeEnum = ['apartment', 'house', 'cabin', 'hotel', 'other'] as const

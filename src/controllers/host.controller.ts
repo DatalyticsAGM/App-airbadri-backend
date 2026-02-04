@@ -12,17 +12,24 @@ function requireUserId(req: Request) {
   return userId
 }
 
+/** Convierte Date, string ISO o undefined a timestamp; evita crash si createdAt no es Date. */
+function toTimestamp(d: Date | string | undefined): number {
+  if (!d) return 0
+  if (d instanceof Date) return d.getTime()
+  const t = new Date(d as string).getTime()
+  return Number.isFinite(t) ? t : 0
+}
+
 export async function hostDashboardHandler(req: Request, res: Response) {
   const hostId = requireUserId(req)
 
   const properties = await listMyProperties(hostId)
-  const propertyIds = new Set(properties.map((p) => p.id))
 
   const allBookingsArrays = await Promise.all(properties.map((p) => listBookingsByProperty(p.id)))
   const hostBookings = allBookingsArrays
     .flat()
     .map((b) => ({ ...b, status: normalizeBookingStatus(b) }))
-    .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+    .sort((a, b) => toTimestamp(b.createdAt) - toTimestamp(a.createdAt))
 
   const reviewsArrays = await Promise.all(properties.map((p) => listReviewsByProperty(p.id)))
   const reviews = reviewsArrays.flatMap((r) => r.items)
@@ -49,7 +56,7 @@ export async function hostDashboardHandler(req: Request, res: Response) {
     recentBookings: hostBookings.slice(0, 5),
     recentReviews: reviews
       .slice()
-      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+      .sort((a, b) => toTimestamp(b.createdAt) - toTimestamp(a.createdAt))
       .slice(0, 5),
     notifications: notifications.slice(0, 10),
   })

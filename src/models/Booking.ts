@@ -1,3 +1,6 @@
+/**
+ * Modelo Mongoose de reserva. Usado por repositories/mongo cuando la persistencia es MongoDB.
+ */
 import mongoose, { Schema } from 'mongoose'
 
 const statusEnum = ['pending', 'confirmed', 'cancelled', 'completed'] as const
