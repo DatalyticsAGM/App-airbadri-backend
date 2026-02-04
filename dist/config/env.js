@@ -18,5 +18,8 @@ function assertEnv() {
     if (!Number.isFinite(exports.env.PORT)) {
         throw new Error('PORT inválido');
     }
+    if (!exports.env.USE_MEMORY_ONLY && !exports.env.MONGO_URI) {
+        throw new Error('Para trabajar con MongoDB define MONGO_URI en .env (o usa USE_MEMORY_ONLY=true para modo memoria)');
+    }
 }
 //# sourceMappingURL=env.js.map

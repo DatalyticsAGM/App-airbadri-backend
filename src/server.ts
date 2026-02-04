@@ -1,26 +1,33 @@
 import './config/dotenv'
 
-import { createApp } from './app'
 import { connectDb } from './config/db'
 import { assertEnv, env } from './config/env'
 
 async function main() {
   assertEnv()
-  if (env.MONGO_URI && !env.USE_MEMORY_ONLY) {
+
+  if (env.USE_MEMORY_ONLY) {
+    console.log('Backend en modo memoria (USE_MEMORY_ONLY=true). Para MongoDB: USE_MEMORY_ONLY=false y MONGO_URI.')
+  } else {
+    if (!env.MONGO_URI) {
+      console.error('Para trabajar con MongoDB define MONGO_URI en .env (y no uses USE_MEMORY_ONLY o ponlo en false).')
+      process.exit(1)
+    }
     try {
       await connectDb(env.MONGO_URI)
     } catch (err) {
-      console.warn('No se pudo conectar a MongoDB; el servidor usará persistencia en memoria.', err)
+      console.error('No se pudo conectar a MongoDB.', err)
+      process.exit(1)
     }
   }
-  if (!env.MONGO_URI || env.USE_MEMORY_ONLY) {
-    console.log('Backend en modo MOCK: persistencia en memoria (sin MongoDB).')
-  }
 
+  // Cargar app después de conectar para que los repositorios usen MongoDB cuando esté conectado.
+  const { createApp } = await import('./app')
   const app = createApp()
 
   app.listen(env.PORT, () => {
     console.log(`API lista en http://localhost:${env.PORT}`)
+    if (!env.USE_MEMORY_ONLY) console.log('Persistencia: MongoDB')
   })
 }
 

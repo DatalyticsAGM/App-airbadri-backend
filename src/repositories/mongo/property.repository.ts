@@ -1,3 +1,4 @@
+import mongoose from 'mongoose'
 import type { Property } from '../../store/memoryProperties'
 import { Property as PropertyModel } from '../../models/Property'
 import type { IPropertyRepository } from '../types'
@@ -38,6 +39,10 @@ function toProperty(doc: PropertyDoc): Property {
   }
 }
 
+function isValidObjectId(id: string): boolean {
+  return mongoose.Types.ObjectId.isValid(String(id || ''))
+}
+
 export function createPropertyRepository(): IPropertyRepository {
   return {
     async list() {
@@ -46,12 +51,14 @@ export function createPropertyRepository(): IPropertyRepository {
     },
 
     async getById(id: string) {
+      if (!isValidObjectId(id)) return null
       const doc = await PropertyModel.findById(id).lean()
       if (!doc) return null
       return toProperty(doc as PropertyDoc)
     },
 
     async listByHost(hostId: string) {
+      if (!isValidObjectId(hostId)) return []
       const docs = await PropertyModel.find({ hostId }).lean().sort({ createdAt: -1 })
       return docs.map((d) => toProperty(d as PropertyDoc))
     },
@@ -74,12 +81,14 @@ export function createPropertyRepository(): IPropertyRepository {
     },
 
     async update(id: string, patch) {
+      if (!isValidObjectId(id)) return null
       const doc = await PropertyModel.findByIdAndUpdate(id, { $set: patch }, { new: true }).lean()
       if (!doc) return null
       return toProperty(doc as PropertyDoc)
     },
 
     async delete(id: string) {
+      if (!isValidObjectId(id)) return false
       const result = await PropertyModel.findByIdAndDelete(id)
       return Boolean(result)
     },

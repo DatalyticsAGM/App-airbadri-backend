@@ -10,8 +10,21 @@ function httpError(status, code, message) {
 }
 function errorHandler(err, _req, res, _next) {
     const e = err;
-    const status = e.status && Number.isFinite(e.status) ? e.status : 500;
-    const code = e.code || (status === 500 ? 'INTERNAL_ERROR' : 'ERROR');
+    // Normalización de errores típicos de Mongo/Mongoose para evitar 500 por inputs inválidos.
+    // - CastError (ObjectId inválido) -> 400
+    // - ValidationError -> 400
+    // - Duplicate key (E11000) -> 409
+    const isCastError = e?.name === 'CastError' && e?.kind === 'ObjectId';
+    const isValidationError = e?.name === 'ValidationError';
+    const isDuplicateKey = e?.code === 11000;
+    const inferredStatus = isDuplicateKey ? 409 : isCastError || isValidationError ? 400 : undefined;
+    const inferredCode = isDuplicateKey
+        ? 'DUPLICATE_KEY'
+        : isCastError || isValidationError
+            ? 'VALIDATION_ERROR'
+            : undefined;
+    const status = (e.status && Number.isFinite(e.status) ? e.status : inferredStatus) ?? 500;
+    const code = e.code || inferredCode || (status === 500 ? 'INTERNAL_ERROR' : 'ERROR');
     const message = status === 500 ? 'Internal server error' : e.message || 'Error';
     const body = { error: { code, message } };
     res.status(status).json(body);

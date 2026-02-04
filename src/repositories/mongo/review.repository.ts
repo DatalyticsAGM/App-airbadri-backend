@@ -33,20 +33,27 @@ function toReview(doc: ReviewDoc): Review {
   }
 }
 
+function isValidObjectId(id: string): boolean {
+  return mongoose.Types.ObjectId.isValid(String(id || ''))
+}
+
 export function createReviewRepository(): IReviewRepository {
   return {
     async listByProperty(propertyId: string) {
+      if (!isValidObjectId(propertyId)) return []
       const docs = await ReviewModel.find({ propertyId }).lean().sort({ createdAt: -1 })
       return docs.map((d) => toReview(d as ReviewDoc))
     },
 
     async findById(id: string) {
+      if (!isValidObjectId(id)) return null
       const doc = await ReviewModel.findById(id).lean()
       if (!doc) return null
       return toReview(doc as ReviewDoc)
     },
 
     async findByPropertyAndUser(propertyId: string, userId: string) {
+      if (!isValidObjectId(propertyId) || !isValidObjectId(userId)) return null
       const doc = await ReviewModel.findOne({ propertyId, userId }).lean()
       if (!doc) return null
       return toReview(doc as ReviewDoc)
@@ -67,17 +74,20 @@ export function createReviewRepository(): IReviewRepository {
     },
 
     async update(id: string, patch) {
+      if (!isValidObjectId(id)) return null
       const doc = await ReviewModel.findByIdAndUpdate(id, { $set: patch }, { new: true }).lean()
       if (!doc) return null
       return toReview(doc as ReviewDoc)
     },
 
     async delete(id: string) {
+      if (!isValidObjectId(id)) return false
       const result = await ReviewModel.findByIdAndDelete(id)
       return Boolean(result)
     },
 
     async getAverageRating(propertyId: string) {
+      if (!isValidObjectId(propertyId)) return 0
       const agg = await ReviewModel.aggregate([
         { $match: { propertyId: new mongoose.Types.ObjectId(propertyId) } },
         { $group: { _id: null, avg: { $avg: '$rating' } } },

@@ -25,5 +25,8 @@ export function assertEnv() {
   if (!Number.isFinite(env.PORT)) {
     throw new Error('PORT inválido')
   }
+  if (!env.USE_MEMORY_ONLY && !env.MONGO_URI) {
+    throw new Error('Para trabajar con MongoDB define MONGO_URI en .env (o usa USE_MEMORY_ONLY=true para modo memoria)')
+  }
 }
 

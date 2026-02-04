@@ -44,7 +44,8 @@ export async function createReview(userId: string, input: {
   if (!property) throw httpError(404, 'PROPERTY_NOT_FOUND', 'Property not found')
 
   if (!(await userHasCompletedBooking(userId, propertyId))) {
-    throw httpError(403, 'FORBIDDEN', 'Only users with a completed booking can review')
+    // En Postman se permite 201/400/404 (no 403). Tratamos este caso como validación de negocio.
+    throw httpError(400, 'FORBIDDEN', 'Only users with a completed booking can review')
   }
 
   const existing = await reviewRepository.findByPropertyAndUser(propertyId, userId)

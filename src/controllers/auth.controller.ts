@@ -1,3 +1,8 @@
+/**
+ * Controlador de autenticación (registro, login, perfil, reset de contraseña).
+ * La persistencia de usuarios la resuelve auth.service → userRepository (MongoDB cuando
+ * MONGO_URI está configurado y USE_MEMORY_ONLY no está activo).
+ */
 import type { Request, Response } from 'express'
 
 import { httpError } from '../middlewares/errorHandler'

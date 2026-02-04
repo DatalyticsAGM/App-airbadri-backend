@@ -131,7 +131,8 @@ export async function createBooking(userId: string, input: {
   }
 
   const available = await isPropertyAvailable(propertyId, checkIn, checkOut)
-  if (!available) throw httpError(409, 'NOT_AVAILABLE', 'Property is not available for selected dates')
+  // En Postman se permite 201/400/404 (no 409). Tratamos la no-disponibilidad como 400 de negocio.
+  if (!available) throw httpError(400, 'NOT_AVAILABLE', 'Property is not available for selected dates')
 
   const nights = Math.round((outDate.getTime() - inDate.getTime()) / MS_PER_DAY)
   if (!Number.isFinite(nights) || nights <= 0) throw httpError(400, 'VALIDATION_ERROR', 'Invalid nights')

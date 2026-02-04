@@ -1,3 +1,4 @@
+import mongoose from 'mongoose'
 import type { Favorite } from '../../store/memoryFavorites'
 import { Favorite as FavoriteModel } from '../../models/Favorite'
 import type { IFavoriteRepository } from '../types'
@@ -18,14 +19,20 @@ function toFavorite(doc: FavoriteDoc): Favorite {
   }
 }
 
+function isValidObjectId(id: string): boolean {
+  return mongoose.Types.ObjectId.isValid(String(id || ''))
+}
+
 export function createFavoriteRepository(): IFavoriteRepository {
   return {
     async getByUser(userId: string) {
+      if (!isValidObjectId(userId)) return []
       const docs = await FavoriteModel.find({ userId }).lean().sort({ date: -1 })
       return docs.map((d) => toFavorite(d as FavoriteDoc))
     },
 
     async isFavorite(userId: string, propertyId: string) {
+      if (!isValidObjectId(userId) || !isValidObjectId(propertyId)) return false
       const doc = await FavoriteModel.findOne({ userId, propertyId }).lean()
       return Boolean(doc)
     },
@@ -42,6 +49,7 @@ export function createFavoriteRepository(): IFavoriteRepository {
     },
 
     async remove(userId: string, propertyId: string) {
+      if (!isValidObjectId(userId) || !isValidObjectId(propertyId)) return false
       const result = await FavoriteModel.deleteOne({ userId, propertyId })
       return result.deletedCount > 0
     },

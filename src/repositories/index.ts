@@ -1,7 +1,7 @@
 /**
- * Punto único de decisión: exporta repositorios de memoria o de MongoDB
- * según USE_MEMORY_ONLY y estado de conexión. Se inicializa al cargar el módulo
- * (después de connectDb en server.ts).
+ * Punto único de decisión: exporta repositorios de memoria o de MongoDB.
+ * Se carga después de connectDb en server.ts (dynamic import de app), por tanto
+ * con MongoDB configurado mongoose ya está conectado y se usan los repos Mongo.
  */
 import mongoose from 'mongoose'
 
@@ -12,6 +12,7 @@ import { createBookingRepository as createMongoBookingRepo } from './mongo/booki
 import { createReviewRepository as createMongoReviewRepo } from './mongo/review.repository'
 import { createFavoriteRepository as createMongoFavoriteRepo } from './mongo/favorite.repository'
 import { createNotificationRepository as createMongoNotificationRepo } from './mongo/notification.repository'
+import { createSearchHistoryRepository as createMongoSearchHistoryRepo } from './mongo/searchHistory.repository'
 import { createMemoryUserRepository, getMemoryUserReset } from './memory/user.repository'
 import { createMemoryPropertyRepository, getMemoryPropertyReset } from './memory/property.repository'
 import { createMemoryBookingRepository, getMemoryBookingReset } from './memory/booking.repository'
@@ -34,7 +35,9 @@ export const bookingRepository: IBookingRepository = memory ? createMemoryBookin
 export const reviewRepository: IReviewRepository = memory ? createMemoryReviewRepository() : createMongoReviewRepo()
 export const favoriteRepository: IFavoriteRepository = memory ? createMemoryFavoriteRepository() : createMongoFavoriteRepo()
 export const notificationRepository: INotificationRepository = memory ? createMemoryNotificationRepository() : createMongoNotificationRepo()
-export const searchHistoryRepository: ISearchHistoryRepository = createMemorySearchHistoryRepository()
+export const searchHistoryRepository: ISearchHistoryRepository = memory
+  ? createMemorySearchHistoryRepository()
+  : createMongoSearchHistoryRepo()
 
 /** Solo para seed en modo memoria: resetea todos los stores en memoria. */
 export function resetAllMemoryForDev(): void {
