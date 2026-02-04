@@ -1,7 +1,25 @@
 import type { Property } from '../../store/memoryProperties'
 import { Property as PropertyModel } from '../../models/Property'
+import type { IPropertyRepository } from '../types'
 
-function toProperty(doc: { _id: { toString(): string }; hostId: { toString(): string }; title: string; description: string; location: string; pricePerNight: number; images: string[]; amenities: string[]; propertyType?: string; bedrooms?: number; bathrooms?: number; maxGuests?: number; createdAt: Date; updatedAt: Date }): Property {
+type PropertyDoc = {
+  _id: { toString(): string }
+  hostId: { toString(): string }
+  title: string
+  description: string
+  location: string
+  pricePerNight: number
+  images: string[]
+  amenities: string[]
+  propertyType?: string
+  bedrooms?: number
+  bathrooms?: number
+  maxGuests?: number
+  createdAt: Date
+  updatedAt: Date
+}
+
+function toProperty(doc: PropertyDoc): Property {
   return {
     id: doc._id.toString(),
     hostId: doc.hostId.toString(),
@@ -20,22 +38,22 @@ function toProperty(doc: { _id: { toString(): string }; hostId: { toString(): st
   }
 }
 
-export function createPropertyRepository(): import('../types').IPropertyRepository {
+export function createPropertyRepository(): IPropertyRepository {
   return {
     async list() {
       const docs = await PropertyModel.find().lean().sort({ createdAt: -1 })
-      return docs.map((d) => toProperty(d as Parameters<typeof toProperty>[0]))
+      return docs.map((d) => toProperty(d as PropertyDoc))
     },
 
     async getById(id: string) {
       const doc = await PropertyModel.findById(id).lean()
       if (!doc) return null
-      return toProperty(doc as Parameters<typeof toProperty>[0])
+      return toProperty(doc as PropertyDoc)
     },
 
     async listByHost(hostId: string) {
       const docs = await PropertyModel.find({ hostId }).lean().sort({ createdAt: -1 })
-      return docs.map((d) => toProperty(d as Parameters<typeof toProperty>[0]))
+      return docs.map((d) => toProperty(d as PropertyDoc))
     },
 
     async create(params) {
@@ -52,13 +70,13 @@ export function createPropertyRepository(): import('../types').IPropertyReposito
         bathrooms: params.bathrooms,
         maxGuests: params.maxGuests,
       })
-      return toProperty(doc as unknown as Parameters<typeof toProperty>[0])
+      return toProperty(doc as PropertyDoc)
     },
 
     async update(id: string, patch) {
       const doc = await PropertyModel.findByIdAndUpdate(id, { $set: patch }, { new: true }).lean()
       if (!doc) return null
-      return toProperty(doc as Parameters<typeof toProperty>[0])
+      return toProperty(doc as PropertyDoc)
     },
 
     async delete(id: string) {

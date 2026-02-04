@@ -1,9 +1,18 @@
 import { User } from '../../models/User'
 import { sha256 } from '../../utils/crypto'
-import type { IUserRepository } from '../types'
-import type { UserForService } from '../types'
+import type { IUserRepository, UserForService } from '../types'
 
-function toUserForService(doc: { _id: { toString(): string }; fullName: string; email: string; avatarUrl?: string; passwordHash: string; resetPasswordTokenHash?: string; resetPasswordExpiresAt?: Date }): UserForService {
+type UserDoc = {
+  _id: { toString(): string }
+  fullName: string
+  email: string
+  avatarUrl?: string
+  passwordHash: string
+  resetPasswordTokenHash?: string
+  resetPasswordExpiresAt?: Date
+}
+
+function toUserForService(doc: UserDoc): UserForService {
   return {
     id: doc._id.toString(),
     fullName: doc.fullName,
@@ -23,19 +32,19 @@ export function createUserRepository(): IUserRepository {
         email: params.email.toLowerCase(),
         passwordHash: params.passwordHash,
       })
-      return toUserForService(doc)
+      return toUserForService(doc as UserDoc)
     },
 
     async findByEmail(email: string) {
       const doc = await User.findOne({ email: email.toLowerCase() }).lean()
       if (!doc) return null
-      return toUserForService(doc as Parameters<typeof toUserForService>[0])
+      return toUserForService(doc as UserDoc)
     },
 
     async findById(id: string) {
       const doc = await User.findById(id).lean()
       if (!doc) return null
-      return toUserForService(doc as Parameters<typeof toUserForService>[0])
+      return toUserForService(doc as UserDoc)
     },
 
     async update(userId: string, patch) {
@@ -45,7 +54,7 @@ export function createUserRepository(): IUserRepository {
       if (typeof patch.avatarUrl === 'string') $set.avatarUrl = patch.avatarUrl
       const doc = await User.findByIdAndUpdate(userId, { $set }, { new: true }).lean()
       if (!doc) return null
-      return toUserForService(doc as Parameters<typeof toUserForService>[0])
+      return toUserForService(doc as UserDoc)
     },
 
     async delete(userId: string) {
@@ -66,7 +75,7 @@ export function createUserRepository(): IUserRepository {
         resetPasswordExpiresAt: { $gt: new Date() },
       }).lean()
       if (!doc) return null
-      return toUserForService(doc as Parameters<typeof toUserForService>[0])
+      return toUserForService(doc as UserDoc)
     },
 
     async resetPassword(userId: string, newPasswordHash: string) {

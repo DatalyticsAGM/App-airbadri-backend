@@ -4,11 +4,11 @@
  * Los tipos de dominio (Property, Booking, etc.) se importan de los stores existentes.
  */
 
-import type { Property, PropertyType } from '../store/memoryProperties'
+import type { Property } from '../store/memoryProperties'
 import type { Booking, BookingStatus } from '../store/memoryBookings'
-import type { Review, RatingBreakdown } from '../store/memoryReviews'
+import type { Review } from '../store/memoryReviews'
 import type { Favorite } from '../store/memoryFavorites'
-import type { Notification, NotificationType } from '../store/memoryNotifications'
+import type { Notification } from '../store/memoryNotifications'
 import type { SearchHistoryEntry } from '../store/memorySearchHistory'
 
 /** Usuario en forma unificada para servicios: siempre tiene id (string). */

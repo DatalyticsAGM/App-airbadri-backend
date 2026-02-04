@@ -1,8 +1,9 @@
 import mongoose from 'mongoose'
 import type { Review, RatingBreakdown } from '../../store/memoryReviews'
 import { Review as ReviewModel } from '../../models/Review'
+import type { IReviewRepository } from '../types'
 
-function toReview(doc: {
+type ReviewDoc = {
   _id: { toString(): string }
   propertyId: { toString(): string }
   userId: { toString(): string }
@@ -14,7 +15,9 @@ function toReview(doc: {
   userAvatar?: string
   createdAt: Date
   updatedAt: Date
-}): Review {
+}
+
+function toReview(doc: ReviewDoc): Review {
   return {
     id: doc._id.toString(),
     propertyId: doc.propertyId.toString(),
@@ -30,23 +33,23 @@ function toReview(doc: {
   }
 }
 
-export function createReviewRepository(): import('../types').IReviewRepository {
+export function createReviewRepository(): IReviewRepository {
   return {
     async listByProperty(propertyId: string) {
       const docs = await ReviewModel.find({ propertyId }).lean().sort({ createdAt: -1 })
-      return docs.map((d) => toReview(d as Parameters<typeof toReview>[0]))
+      return docs.map((d) => toReview(d as ReviewDoc))
     },
 
     async findById(id: string) {
       const doc = await ReviewModel.findById(id).lean()
       if (!doc) return null
-      return toReview(doc as Parameters<typeof toReview>[0])
+      return toReview(doc as ReviewDoc)
     },
 
     async findByPropertyAndUser(propertyId: string, userId: string) {
       const doc = await ReviewModel.findOne({ propertyId, userId }).lean()
       if (!doc) return null
-      return toReview(doc as Parameters<typeof toReview>[0])
+      return toReview(doc as ReviewDoc)
     },
 
     async create(params) {
@@ -60,13 +63,13 @@ export function createReviewRepository(): import('../types').IReviewRepository {
         userName: params.userName,
         userAvatar: params.userAvatar,
       })
-      return toReview(doc as unknown as Parameters<typeof toReview>[0])
+      return toReview(doc as ReviewDoc)
     },
 
     async update(id: string, patch) {
       const doc = await ReviewModel.findByIdAndUpdate(id, { $set: patch }, { new: true }).lean()
       if (!doc) return null
-      return toReview(doc as Parameters<typeof toReview>[0])
+      return toReview(doc as ReviewDoc)
     },
 
     async delete(id: string) {

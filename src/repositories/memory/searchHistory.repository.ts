@@ -16,6 +16,7 @@ export function createMemorySearchHistoryRepository(): ISearchHistoryRepository 
     },
     async clear(userId: string) {
       memoryClearSearchHistory(userId)
+      return
     },
   }
 }
