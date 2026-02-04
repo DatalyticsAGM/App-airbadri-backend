@@ -8,6 +8,8 @@
     "build": "npm run clean && tsc -p tsconfig.json",
     "start": "node dist/server.js",
     "dev": "nodemon",
+    "seed:interactive": "npm run build && node dist/dev/seed-interactive.js",
+    "seed:all:mongo": "npm run seed:interactive",
     "test": "npm run build && node --test tests/health.test.js tests/auth.test.js tests/properties.test.js tests/stores/memoryProperties.test.js"
   },
   "keywords": [],
