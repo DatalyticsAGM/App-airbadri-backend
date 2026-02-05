@@ -1,0 +1,60 @@
+---
+GET /
+HTTP/1.1 200 OK
+X-Powered-By: Express
+Access-Control-Allow-Origin: http://localhost:3000
+Vary: Origin
+Access-Control-Allow-Credentials: true
+Content-Type: application/json; charset=utf-8
+Content-Length: 529
+ETag: W/"211-wIQkIpMth17+PKuUeDWve01+eyU"
+Date: Thu, 05 Feb 2026 00:54:20 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+{"message":"🚀 Airbnb Backend API funcionando","version":"1.0.0","endpoints":{"auth":"/api/auth","users":"/api/users","properties":"/api/properties","bookings":"/api/bookings","reviews":"/api/reviews","notifications":"/api/notifications","favorites":"/api/favorites","host":"/api/host","hostDashboard":"GET /api/host/dashboard","register":"POST /api/auth/register","login":"POST /api/auth/login","forgotPassword":"POST /api/auth/forgot-password","resetPassword":"POST /api/auth/reset-password","verify":"GET /api/auth/verify"}}
+---
+GET /health
+HTTP/1.1 200 OK
+X-Powered-By: Express
+Access-Control-Allow-Origin: http://localhost:3000
+Vary: Origin
+Access-Control-Allow-Credentials: true
+Content-Type: application/json; charset=utf-8
+Content-Length: 11
+ETag: W/"b-Ai2R8hgEarLmHKwesT1qcY913ys"
+Date: Thu, 05 Feb 2026 00:54:20 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+{"ok":true}
+---
+GET /ready
+HTTP/1.1 200 OK
+X-Powered-By: Express
+Access-Control-Allow-Origin: http://localhost:3000
+Vary: Origin
+Access-Control-Allow-Credentials: true
+Content-Type: application/json; charset=utf-8
+Content-Length: 44
+ETag: W/"2c-y9NppUBUo30O/NNMVzApjmUtDsE"
+Date: Thu, 05 Feb 2026 00:54:20 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+{"ok":true,"ready":true,"mongo":"connected"}
+---
+GET /api/info
+HTTP/1.1 200 OK
+X-Powered-By: Express
+Access-Control-Allow-Origin: http://localhost:3000
+Vary: Origin
+Access-Control-Allow-Credentials: true
+Content-Type: application/json; charset=utf-8
+Content-Length: 58
+ETag: W/"3a-l6hKlqVUeWu8kVdnQgXneuGXMGI"
+Date: Thu, 05 Feb 2026 00:54:20 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+{"version":"1.0.0","memoryOnly":false,"env":"development"}
