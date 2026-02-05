@@ -11,22 +11,23 @@ import type { Favorite } from '../store/memoryFavorites'
 import type { Notification } from '../store/memoryNotifications'
 import type { SearchHistoryEntry } from '../store/memorySearchHistory'
 
-/** Usuario en forma unificada para servicios: siempre tiene id (string). */
+/** Usuario en forma unificada para servicios: siempre tiene id (string) y role. */
 export type UserForService = {
   id: string
   fullName: string
   email: string
   avatarUrl?: string
+  role: string
   passwordHash: string
   resetPasswordTokenHash?: string
   resetPasswordExpiresAt?: Date
 }
 
 export interface IUserRepository {
-  create(params: { fullName: string; email: string; passwordHash: string }): Promise<UserForService>
+  create(params: { fullName: string; email: string; passwordHash: string; role?: string }): Promise<UserForService>
   findByEmail(email: string): Promise<UserForService | null>
   findById(id: string): Promise<UserForService | null>
-  update(userId: string, patch: { fullName?: string; email?: string; avatarUrl?: string }): Promise<UserForService | null>
+  update(userId: string, patch: { fullName?: string; email?: string; avatarUrl?: string; role?: string }): Promise<UserForService | null>
   delete(userId: string): Promise<boolean>
   setResetPasswordToken(userId: string, token: string, expiresAt: Date): Promise<void>
   findByValidResetToken(token: string): Promise<UserForService | null>

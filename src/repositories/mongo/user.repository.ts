@@ -7,6 +7,7 @@ type UserDoc = {
   fullName: string
   email: string
   avatarUrl?: string
+  role?: string
   passwordHash: string
   resetPasswordTokenHash?: string
   resetPasswordExpiresAt?: Date
@@ -18,6 +19,7 @@ function toUserForService(doc: UserDoc): UserForService {
     fullName: doc.fullName,
     email: doc.email,
     avatarUrl: doc.avatarUrl,
+    role: doc.role ?? 'user',
     passwordHash: doc.passwordHash,
     resetPasswordTokenHash: doc.resetPasswordTokenHash,
     resetPasswordExpiresAt: doc.resetPasswordExpiresAt,
@@ -27,10 +29,20 @@ function toUserForService(doc: UserDoc): UserForService {
 export function createUserRepository(): IUserRepository {
   return {
     async create(params) {
+      const requestedRole = params.role === 'admin' || params.role === 'host' ? params.role : 'user'
+
+      // Regla de negocio: solo puede existir 1 admin. Si ya existe, se reutiliza.
+      if (requestedRole === 'admin') {
+        const existingAdmin = await User.findOne({ role: 'admin' }).lean()
+        if (existingAdmin) return toUserForService(existingAdmin as UserDoc)
+      }
+
+      const role = requestedRole
       const doc = await User.create({
         fullName: params.fullName,
         email: params.email.toLowerCase(),
         passwordHash: params.passwordHash,
+        role,
       })
       return toUserForService(doc as UserDoc)
     },
@@ -48,10 +60,11 @@ export function createUserRepository(): IUserRepository {
     },
 
     async update(userId: string, patch) {
-      const $set: { fullName?: string; email?: string; avatarUrl?: string } = {}
+      const $set: { fullName?: string; email?: string; avatarUrl?: string; role?: string } = {}
       if (typeof patch.fullName === 'string') $set.fullName = patch.fullName
       if (typeof patch.email === 'string') $set.email = patch.email.toLowerCase()
       if (typeof patch.avatarUrl === 'string') $set.avatarUrl = patch.avatarUrl
+      if (patch.role === 'admin' || patch.role === 'host' || patch.role === 'user') $set.role = patch.role
       const doc = await User.findByIdAndUpdate(userId, { $set }, { new: true }).lean()
       if (!doc) return null
       return toUserForService(doc as UserDoc)

@@ -4,6 +4,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.requireAuth = requireAuth;
+exports.requireAdmin = requireAdmin;
+exports.requireHostOrAdmin = requireHostOrAdmin;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const env_1 = require("../config/env");
 const errorHandler_1 = require("./errorHandler");
@@ -17,10 +19,23 @@ function requireAuth(req, _res, next) {
         if (!payload.sub)
             return next((0, errorHandler_1.httpError)(401, 'UNAUTHORIZED', 'Invalid access token'));
         req.userId = payload.sub;
+        req.userRole = payload.role === 'admin' || payload.role === 'host' ? payload.role : 'user';
         return next();
     }
     catch {
         return next((0, errorHandler_1.httpError)(401, 'UNAUTHORIZED', 'Invalid access token'));
     }
+}
+function requireAdmin(req, _res, next) {
+    const role = String(req.userRole || 'user');
+    if (role !== 'admin')
+        return next((0, errorHandler_1.httpError)(403, 'FORBIDDEN', 'Admin access required'));
+    return next();
+}
+function requireHostOrAdmin(req, _res, next) {
+    const role = String(req.userRole || 'user');
+    if (role !== 'host' && role !== 'admin')
+        return next((0, errorHandler_1.httpError)(403, 'FORBIDDEN', 'Host or admin access required'));
+    return next();
 }
 //# sourceMappingURL=auth.js.map

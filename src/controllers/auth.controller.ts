@@ -35,7 +35,7 @@ export async function signup(req: Request, res: Response) {
   if (existing) throw httpError(409, 'EMAIL_IN_USE', 'Email already registered')
 
   const user = await createUser({ fullName, email, password })
-  const accessToken = signAccessToken(getUserId(user))
+  const accessToken = signAccessToken(getUserId(user), user.role)
 
   res.status(201).json({ user: toPublicUser(user), accessToken })
 }
@@ -53,7 +53,7 @@ export async function login(req: Request, res: Response) {
   const ok = await verifyPassword(password, user.passwordHash)
   if (!ok) throw httpError(401, 'INVALID_CREDENTIALS', 'Invalid credentials')
 
-  const accessToken = signAccessToken(getUserId(user))
+  const accessToken = signAccessToken(getUserId(user), user.role)
   res.json({ user: toPublicUser(user), accessToken })
 }
 

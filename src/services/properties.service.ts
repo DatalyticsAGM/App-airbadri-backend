@@ -5,7 +5,7 @@
  * disponibilidad (usa bookings.service). Usa repositorios (memoria o MongoDB).
  */
 import { httpError } from '../middlewares/errorHandler'
-import { propertyRepository, bookingRepository, reviewRepository } from '../repositories'
+import { propertyRepository, bookingRepository, reviewRepository, userRepository } from '../repositories'
 import type { Property, PropertyType } from '../store/memoryProperties'
 import { isPropertyAvailable } from './bookings.service'
 
@@ -195,7 +195,7 @@ export async function createProperty(hostId: string, input: {
     ? input.amenities.map(String).map((s) => s.trim()).filter(Boolean)
     : []
 
-  return propertyRepository.create({
+  const property = await propertyRepository.create({
     hostId,
     title,
     description,
@@ -208,6 +208,14 @@ export async function createProperty(hostId: string, input: {
     bathrooms: input.bathrooms,
     maxGuests: input.maxGuests,
   })
+
+  // Quien ofrece una vivienda pasa a ser host (distinto del usuario que solo alquila).
+  const user = await userRepository.findById(hostId)
+  if (user && user.role === 'user') {
+    await userRepository.update(hostId, { role: 'host' })
+  }
+
+  return property
 }
 
 /**
@@ -224,9 +232,10 @@ export async function updateProperty(hostId: string, propertyId: string, patch: 
   bedrooms?: number
   bathrooms?: number
   maxGuests?: number
-}>) {
+}>, opts?: { isAdmin?: boolean }) {
   const current = await getPropertyByIdOrThrow(propertyId)
-  if (current.hostId !== hostId) throw httpError(403, 'FORBIDDEN', 'Not allowed')
+  const isAdmin = Boolean(opts?.isAdmin)
+  if (!isAdmin && current.hostId !== hostId) throw httpError(403, 'FORBIDDEN', 'Not allowed')
 
   type PropertyPatch = Partial<Omit<Property, 'id' | 'hostId' | 'createdAt' | 'updatedAt'>>
   const next: PropertyPatch = {}
@@ -273,11 +282,24 @@ export async function updateProperty(hostId: string, propertyId: string, patch: 
 /**
  * Elimina una propiedad. Solo el host dueño puede eliminarla. Borra también las reservas asociadas.
  */
-export async function deleteProperty(hostId: string, propertyId: string) {
+export async function deleteProperty(hostId: string, propertyId: string, opts?: { isAdmin?: boolean }) {
   const current = await getPropertyByIdOrThrow(propertyId)
-  if (current.hostId !== hostId) throw httpError(403, 'FORBIDDEN', 'Not allowed')
+  const isAdmin = Boolean(opts?.isAdmin)
+  if (!isAdmin && current.hostId !== hostId) throw httpError(403, 'FORBIDDEN', 'Not allowed')
 
   await bookingRepository.deleteByProperty(propertyId)
   const ok = await propertyRepository.delete(propertyId)
+
+  // Si ya no tiene ninguna propiedad, deja de ser host y vuelve a user (no se toca admin).
+  if (ok) {
+    const remaining = await propertyRepository.listByHost(hostId)
+    if (remaining.length === 0) {
+      const user = await userRepository.findById(hostId)
+      if (user && user.role === 'host') {
+        await userRepository.update(hostId, { role: 'user' })
+      }
+    }
+  }
+
   return ok
 }

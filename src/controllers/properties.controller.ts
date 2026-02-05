@@ -1,6 +1,7 @@
 import type { Request, Response } from 'express'
 
 import { httpError } from '../middlewares/errorHandler'
+import { findUserById, signAccessToken } from '../services/auth.service'
 import { isPropertyAvailable } from '../services/bookings.service'
 import { getBookingPreview } from '../services/bookings.service'
 import {
@@ -145,17 +146,25 @@ export async function createPropertyHandler(req: Request, res: Response) {
     maxGuests: req.body?.maxGuests,
   })
 
+  // Si se promovió a host, devolver nuevo token para que el cliente actualice (el JWT lleva el rol).
+  const user = await findUserById(hostId)
+  if (user && user.role === 'host') {
+    const accessToken = signAccessToken(hostId, user.role)
+    res.status(201).json({ ...property, accessToken })
+    return
+  }
   res.status(201).json(property)
 }
 
 export async function updatePropertyHandler(req: Request, res: Response) {
   const hostId = String((req as any).userId || '')
   if (!hostId) throw httpError(401, 'UNAUTHORIZED', 'Unauthorized')
+  const isAdmin = String((req as any).userRole || 'user') === 'admin'
 
   const id = String(req.params?.id || '').trim()
   if (!id) throw httpError(400, 'VALIDATION_ERROR', 'id is required')
 
-  const updated = await updateProperty(hostId, id, req.body || {})
+  const updated = await updateProperty(hostId, id, req.body || {}, { isAdmin })
 
   res.json(updated)
 }
@@ -163,11 +172,12 @@ export async function updatePropertyHandler(req: Request, res: Response) {
 export async function deletePropertyHandler(req: Request, res: Response) {
   const hostId = String((req as any).userId || '')
   if (!hostId) throw httpError(401, 'UNAUTHORIZED', 'Unauthorized')
+  const isAdmin = String((req as any).userRole || 'user') === 'admin'
 
   const id = String(req.params?.id || '').trim()
   if (!id) throw httpError(400, 'VALIDATION_ERROR', 'id is required')
 
-  await deleteProperty(hostId, id)
+  await deleteProperty(hostId, id, { isAdmin })
   res.status(204).send()
 }
 

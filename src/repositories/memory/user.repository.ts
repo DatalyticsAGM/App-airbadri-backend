@@ -12,12 +12,13 @@ import {
 } from '../../store/memoryUsers'
 import type { IUserRepository } from '../types'
 
-function toUserForService(u: { id: string; fullName: string; email: string; avatarUrl?: string; passwordHash: string; resetPasswordTokenHash?: string; resetPasswordExpiresAt?: Date }): UserForService {
+function toUserForService(u: { id: string; fullName: string; email: string; avatarUrl?: string; role?: string; passwordHash: string; resetPasswordTokenHash?: string; resetPasswordExpiresAt?: Date }): UserForService {
   return {
     id: u.id,
     fullName: u.fullName,
     email: u.email,
     avatarUrl: u.avatarUrl,
+    role: u.role ?? 'user',
     passwordHash: u.passwordHash,
     resetPasswordTokenHash: u.resetPasswordTokenHash,
     resetPasswordExpiresAt: u.resetPasswordExpiresAt,
@@ -27,7 +28,7 @@ function toUserForService(u: { id: string; fullName: string; email: string; avat
 export function createMemoryUserRepository(): IUserRepository {
   return {
     async create(params) {
-      const u = memoryCreateUser(params)
+      const u = memoryCreateUser({ ...params, role: params.role })
       return toUserForService(u)
     },
     async findByEmail(email: string) {

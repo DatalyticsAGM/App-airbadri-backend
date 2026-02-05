@@ -26,11 +26,12 @@ export async function getMyBookingHandler(req: Request, res: Response) {
   const userId = requireUserId(req)
   const id = String(req.params?.id || '').trim()
   if (!id) throw httpError(400, 'VALIDATION_ERROR', 'id is required')
+  const isAdmin = String((req as any).userRole || 'user') === 'admin'
 
   const include = String(req.query?.include || '').trim().toLowerCase()
   const withProperty = include === 'property'
 
-  const booking = await getMyBookingByIdOrThrow(userId, id)
+  const booking = await getMyBookingByIdOrThrow(userId, id, { isAdmin })
   const payload: Record<string, unknown> = { ...booking, status: normalizeBookingStatus(booking) }
   if (withProperty) {
     const { getPropertyByIdOrThrow } = await import('../services/properties.service')
@@ -59,13 +60,14 @@ export async function patchBookingHandler(req: Request, res: Response) {
   const userId = requireUserId(req)
   const id = String(req.params?.id || '').trim()
   if (!id) throw httpError(400, 'VALIDATION_ERROR', 'id is required')
+  const isAdmin = String((req as any).userRole || 'user') === 'admin'
 
   const status = String(req.body?.status || '').trim()
   if (status !== 'cancelled') {
     throw httpError(400, 'VALIDATION_ERROR', 'Only status=cancelled is supported')
   }
 
-  const updated = await cancelMyBooking(userId, id)
+  const updated = await cancelMyBooking(userId, id, { isAdmin })
   res.json({ ...updated, status: normalizeBookingStatus(updated) })
 }
 

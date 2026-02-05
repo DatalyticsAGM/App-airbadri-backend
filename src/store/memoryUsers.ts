@@ -7,6 +7,7 @@ export type MemoryUser = {
   fullName: string
   email: string
   avatarUrl?: string
+  role: string
   passwordHash: string
   resetPasswordTokenHash?: string
   resetPasswordExpiresAt?: Date
@@ -19,12 +20,24 @@ export function memoryCreateUser(params: {
   fullName: string
   email: string
   passwordHash: string
+  role?: string
 }): MemoryUser {
+  const requestedRole = params.role === 'admin' || params.role === 'host' ? params.role : 'user'
+
+  // Regla de negocio: solo puede existir 1 admin. Si ya existe, se reutiliza.
+  if (requestedRole === 'admin') {
+    for (const u of usersById.values()) {
+      if (u.role === 'admin') return u
+    }
+  }
+
   const id = crypto.randomUUID()
+  const role = requestedRole
   const user: MemoryUser = {
     id,
     fullName: params.fullName,
     email: params.email.toLowerCase(),
+    role,
     passwordHash: params.passwordHash,
   }
 
@@ -45,7 +58,7 @@ export function memoryFindUserById(id: string) {
 
 export function memoryUpdateUser(
   userId: string,
-  patch: { fullName?: string; email?: string; avatarUrl?: string }
+  patch: { fullName?: string; email?: string; avatarUrl?: string; role?: string }
 ): MemoryUser | null {
   const user = usersById.get(userId)
   if (!user) return null
@@ -65,6 +78,10 @@ export function memoryUpdateUser(
 
   if (typeof patch.avatarUrl === 'string') {
     user.avatarUrl = patch.avatarUrl
+  }
+
+  if (patch.role === 'admin' || patch.role === 'host' || patch.role === 'user') {
+    user.role = patch.role
   }
 
   return user

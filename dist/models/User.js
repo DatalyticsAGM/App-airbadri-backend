@@ -42,10 +42,12 @@ exports.User = void 0;
  * El tipo UserDoc es solo interno (no se exporta).
  */
 const mongoose_1 = __importStar(require("mongoose"));
+const roleEnum = ['user', 'host', 'admin'];
 const userSchema = new mongoose_1.Schema({
     fullName: { type: String, required: true, trim: true },
     email: { type: String, required: true, unique: true, lowercase: true, trim: true },
     avatarUrl: { type: String, required: false },
+    role: { type: String, enum: roleEnum, required: true, default: 'user' },
     passwordHash: { type: String, required: true },
     resetPasswordTokenHash: { type: String, required: false },
     resetPasswordExpiresAt: { type: Date, required: false },

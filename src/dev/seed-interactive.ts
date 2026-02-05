@@ -118,7 +118,7 @@ async function maybeWipeCollections(rl: ReturnType<typeof createInterface>) {
 }
 
 async function seedUsers(rl: ReturnType<typeof createInterface>) {
-  if (!(await confirmYesNo(rl, '3) Crear usuarios (admin, host, guest)'))) return null
+  if (!(await confirmYesNo(rl, '3) Crear usuarios (1 admin, 1 host, 1 user)'))) return null
 
   printCompromisedAlert(
     'Se crearán usuarios con credenciales conocidas para desarrollo.\n' +
@@ -133,16 +133,19 @@ async function seedUsers(rl: ReturnType<typeof createInterface>) {
     fullName: 'Admin Demo',
     email: 'admin@example.com',
     password: DEFAULT_SEED_PASSWORD,
+    role: 'admin',
   })
   const host = await createUser({
     fullName: 'Host Demo',
     email: 'host@example.com',
     password: DEFAULT_SEED_PASSWORD,
+    role: 'host',
   })
   const guest = await createUser({
-    fullName: 'Guest Demo',
-    email: 'guest@example.com',
+    fullName: 'Usuario Demo',
+    email: 'user@example.com',
     password: DEFAULT_SEED_PASSWORD,
+    role: 'user',
   })
 
   const adminId = getUserId(admin)

@@ -46,7 +46,7 @@ function getUserId(user) {
  * @returns Objeto PublicUser (id, fullName, email, avatarUrl opcional).
  */
 function toPublicUser(user) {
-    return { id: user.id, fullName: user.fullName, email: user.email, avatarUrl: user.avatarUrl };
+    return { id: user.id, fullName: user.fullName, email: user.email, role: user.role ?? 'user', avatarUrl: user.avatarUrl };
 }
 /**
  * Genera un hash de la contraseña con bcrypt (salt de 10 rondas).
@@ -74,9 +74,10 @@ async function verifyPassword(password, passwordHash) {
  * @param userId - Id del usuario.
  * @returns Token JWT en string.
  */
-function signAccessToken(userId) {
+function signAccessToken(userId, role) {
     const expiresIn = env_1.env.JWT_EXPIRES_IN;
-    return jsonwebtoken_1.default.sign({ sub: userId }, env_1.env.JWT_SECRET, { expiresIn });
+    const safeRole = role === 'admin' || role === 'host' ? role : 'user';
+    return jsonwebtoken_1.default.sign({ sub: userId, role: safeRole }, env_1.env.JWT_SECRET, { expiresIn });
 }
 /**
  * Hash SHA-256. Re-exportado desde utils/crypto.
@@ -93,8 +94,9 @@ function generateResetToken() {
 }
 /**
  * Crea un nuevo usuario: hashea la contraseña y lo persiste vía repositorio.
+ * Por defecto el rol es user (todos los que se registran). Solo el seed crea el único admin; host se puede asignar internamente.
  *
- * @param params - fullName, email y password en texto plano.
+ * @param params - fullName, email, password y opcionalmente role (user | host | admin).
  * @returns Promesa con el usuario creado (UserForService).
  */
 async function createUser(params) {
@@ -103,6 +105,7 @@ async function createUser(params) {
         fullName: params.fullName,
         email: params.email.toLowerCase(),
         passwordHash,
+        role: params.role,
     });
 }
 /**

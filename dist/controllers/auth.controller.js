@@ -24,7 +24,7 @@ async function signup(req, res) {
     if (existing)
         throw (0, errorHandler_1.httpError)(409, 'EMAIL_IN_USE', 'Email already registered');
     const user = await (0, auth_service_1.createUser)({ fullName, email, password });
-    const accessToken = (0, auth_service_1.signAccessToken)((0, auth_service_1.getUserId)(user));
+    const accessToken = (0, auth_service_1.signAccessToken)((0, auth_service_1.getUserId)(user), user.role);
     res.status(201).json({ user: (0, auth_service_1.toPublicUser)(user), accessToken });
 }
 async function login(req, res) {
@@ -40,7 +40,7 @@ async function login(req, res) {
     const ok = await (0, auth_service_1.verifyPassword)(password, user.passwordHash);
     if (!ok)
         throw (0, errorHandler_1.httpError)(401, 'INVALID_CREDENTIALS', 'Invalid credentials');
-    const accessToken = (0, auth_service_1.signAccessToken)((0, auth_service_1.getUserId)(user));
+    const accessToken = (0, auth_service_1.signAccessToken)((0, auth_service_1.getUserId)(user), user.role);
     res.json({ user: (0, auth_service_1.toPublicUser)(user), accessToken });
 }
 async function me(req, res) {

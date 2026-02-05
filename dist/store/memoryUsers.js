@@ -17,11 +17,21 @@ const crypto_2 = require("../utils/crypto");
 const usersById = new Map();
 const usersByEmail = new Map(); // email -> id
 function memoryCreateUser(params) {
+    const requestedRole = params.role === 'admin' || params.role === 'host' ? params.role : 'user';
+    // Regla de negocio: solo puede existir 1 admin. Si ya existe, se reutiliza.
+    if (requestedRole === 'admin') {
+        for (const u of usersById.values()) {
+            if (u.role === 'admin')
+                return u;
+        }
+    }
     const id = crypto_1.default.randomUUID();
+    const role = requestedRole;
     const user = {
         id,
         fullName: params.fullName,
         email: params.email.toLowerCase(),
+        role,
         passwordHash: params.passwordHash,
     };
     usersById.set(id, user);
@@ -54,6 +64,9 @@ function memoryUpdateUser(userId, patch) {
     }
     if (typeof patch.avatarUrl === 'string') {
         user.avatarUrl = patch.avatarUrl;
+    }
+    if (patch.role === 'admin' || patch.role === 'host' || patch.role === 'user') {
+        user.role = patch.role;
     }
     return user;
 }

@@ -38,8 +38,9 @@ export async function updateReviewHandler(req: Request, res: Response) {
   const userId = requireUserId(req)
   const id = String(req.params?.id || '').trim()
   if (!id) throw httpError(400, 'VALIDATION_ERROR', 'id is required')
+  const isAdmin = String((req as any).userRole || 'user') === 'admin'
 
-  const updated = await updateReview(userId, id, { rating: req.body?.rating, comment: req.body?.comment })
+  const updated = await updateReview(userId, id, { rating: req.body?.rating, comment: req.body?.comment }, { isAdmin })
   res.json(updated)
 }
 
@@ -47,8 +48,9 @@ export async function deleteReviewHandler(req: Request, res: Response) {
   const userId = requireUserId(req)
   const id = String(req.params?.id || '').trim()
   if (!id) throw httpError(400, 'VALIDATION_ERROR', 'id is required')
+  const isAdmin = String((req as any).userRole || 'user') === 'admin'
 
-  await deleteReview(userId, id)
+  await deleteReview(userId, id, { isAdmin })
   res.json({ ok: true })
 }
 

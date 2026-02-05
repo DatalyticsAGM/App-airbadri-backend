@@ -7,6 +7,11 @@
  */
 import mongoose, { Schema } from 'mongoose'
 
+/** Roles de usuario: user (por defecto para todos los que se registran), host, admin (solo uno creado en seed). */
+export type UserRole = 'user' | 'host' | 'admin'
+
+const roleEnum: UserRole[] = ['user', 'host', 'admin']
+
 /**
  * Tipo del documento de usuario tal como se persiste (MongoDB o representación equivalente).
  * Contiene los datos sensibles (passwordHash) y los usados para reset de contraseña.
@@ -14,6 +19,7 @@ import mongoose, { Schema } from 'mongoose'
  * @property _id - Identificador único del documento (ObjectId en MongoDB).
  * @property fullName - Nombre completo del usuario.
  * @property email - Correo electrónico (único, se guarda en minúsculas).
+ * @property role - Rol: user, host o admin.
  * @property passwordHash - Contraseña hasheada con bcrypt (nunca se devuelve en respuestas públicas).
  * @property resetPasswordTokenHash - Hash del token de restablecimiento de contraseña, si existe.
  * @property resetPasswordExpiresAt - Fecha de expiración del token de reset.
@@ -25,6 +31,7 @@ type UserDoc = {
   fullName: string
   email: string
   avatarUrl?: string
+  role: UserRole
   passwordHash: string
   resetPasswordTokenHash?: string
   resetPasswordExpiresAt?: Date
@@ -37,6 +44,7 @@ const userSchema = new Schema<UserDoc>(
     fullName: { type: String, required: true, trim: true },
     email: { type: String, required: true, unique: true, lowercase: true, trim: true },
     avatarUrl: { type: String, required: false },
+    role: { type: String, enum: roleEnum, required: true, default: 'user' },
     passwordHash: { type: String, required: true },
     resetPasswordTokenHash: { type: String, required: false },
     resetPasswordExpiresAt: { type: Date, required: false },

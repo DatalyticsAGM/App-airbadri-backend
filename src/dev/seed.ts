@@ -30,10 +30,20 @@ export async function runSeed(): Promise<SeedResult> {
 
   const users: { email: string; id: string; role: string }[] = []
 
+  const admin = await createUser({
+    fullName: 'Admin Sistema',
+    email: 'administrador@example.com',
+    password: SEED_PASSWORD,
+    role: 'admin',
+  })
+  const adminId = getUserId(admin)
+  users.push({ email: 'admin@example.com', id: adminId, role: 'admin' })
+
   const host1 = await createUser({
     fullName: 'Ana Host',
     email: 'host1@example.com',
     password: SEED_PASSWORD,
+    role: 'host',
   })
   const host1Id = getUserId(host1)
   users.push({ email: 'host1@example.com', id: host1Id, role: 'host' })
@@ -42,17 +52,19 @@ export async function runSeed(): Promise<SeedResult> {
     fullName: 'Bruno Host',
     email: 'host2@example.com',
     password: SEED_PASSWORD,
+    role: 'host',
   })
   const host2Id = getUserId(host2)
   users.push({ email: 'host2@example.com', id: host2Id, role: 'host' })
 
   const guest = await createUser({
-    fullName: 'Clara Guest',
-    email: 'guest@example.com',
+    fullName: 'Clara Usuario',
+    email: 'user@example.com',
     password: SEED_PASSWORD,
+    role: 'user',
   })
   const guestId = getUserId(guest)
-  users.push({ email: 'guest@example.com', id: guestId, role: 'guest' })
+  users.push({ email: 'user@example.com', id: guestId, role: 'user' })
 
   const p1 = await propertyRepository.create({
     hostId: host1Id,
@@ -123,7 +135,7 @@ export async function runSeed(): Promise<SeedResult> {
     rating: 5,
     comment: 'Excelente estadía, todo muy limpio.',
     date: new Date().toISOString(),
-    userName: 'Clara Guest',
+    userName: 'Clara Usuario',
   })
 
   return {

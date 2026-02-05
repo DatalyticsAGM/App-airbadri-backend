@@ -95,10 +95,16 @@ export async function listBookingsByProperty(propertyId: string) {
 /**
  * Obtiene una reserva por id si pertenece al usuario; si no, lanza error.
  */
-export async function getMyBookingByIdOrThrow(userId: string, bookingId: string) {
+export async function getMyBookingByIdOrThrow(
+  userId: string,
+  bookingId: string,
+  opts?: { isAdmin?: boolean }
+) {
   const booking = await bookingRepository.getById(bookingId)
   if (!booking) throw httpError(404, 'BOOKING_NOT_FOUND', 'Booking not found')
-  if (booking.userId !== userId) throw httpError(403, 'FORBIDDEN', 'Not allowed')
+  const isAdmin = Boolean(opts?.isAdmin)
+  // Admin puede acceder a cualquier reserva.
+  if (!isAdmin && booking.userId !== userId) throw httpError(403, 'FORBIDDEN', 'Not allowed')
   return booking
 }
 
@@ -165,8 +171,8 @@ export async function createBooking(userId: string, input: {
 /**
  * Cancela una reserva del usuario. Notifica al host.
  */
-export async function cancelMyBooking(userId: string, bookingId: string) {
-  const booking = await getMyBookingByIdOrThrow(userId, bookingId)
+export async function cancelMyBooking(userId: string, bookingId: string, opts?: { isAdmin?: boolean }) {
+  const booking = await getMyBookingByIdOrThrow(userId, bookingId, opts)
   if (booking.status === 'cancelled') return booking
 
   const updated = await bookingRepository.updateStatus(bookingId, 'cancelled')

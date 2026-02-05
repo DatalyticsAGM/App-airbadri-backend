@@ -19,9 +19,10 @@ import type { UserForService } from '../repositories/types'
  * @property id - Identificador del usuario (string).
  * @property fullName - Nombre completo.
  * @property email - Correo electrónico.
+ * @property role - Rol: user, host o admin.
  * @property avatarUrl - URL del avatar (opcional; solo si el store lo soporta).
  */
-export type PublicUser = { id: string; fullName: string; email: string; avatarUrl?: string }
+export type PublicUser = { id: string; fullName: string; email: string; role: string; avatarUrl?: string }
 
 /**
  * Obtiene el id del usuario como string.
@@ -40,7 +41,7 @@ export function getUserId(user: UserForService): string {
  * @returns Objeto PublicUser (id, fullName, email, avatarUrl opcional).
  */
 export function toPublicUser(user: UserForService): PublicUser {
-  return { id: user.id, fullName: user.fullName, email: user.email, avatarUrl: user.avatarUrl }
+  return { id: user.id, fullName: user.fullName, email: user.email, role: user.role ?? 'user', avatarUrl: user.avatarUrl }
 }
 
 /**
@@ -71,9 +72,10 @@ export async function verifyPassword(password: string, passwordHash: string) {
  * @param userId - Id del usuario.
  * @returns Token JWT en string.
  */
-export function signAccessToken(userId: string) {
+export function signAccessToken(userId: string, role: string) {
   const expiresIn = env.JWT_EXPIRES_IN as SignOptions['expiresIn']
-  return jwt.sign({ sub: userId }, env.JWT_SECRET, { expiresIn })
+  const safeRole = role === 'admin' || role === 'host' ? role : 'user'
+  return jwt.sign({ sub: userId, role: safeRole }, env.JWT_SECRET, { expiresIn })
 }
 
 /**
@@ -92,16 +94,18 @@ export function generateResetToken() {
 
 /**
  * Crea un nuevo usuario: hashea la contraseña y lo persiste vía repositorio.
+ * Por defecto el rol es user (todos los que se registran). Solo el seed crea el único admin; host se puede asignar internamente.
  *
- * @param params - fullName, email y password en texto plano.
+ * @param params - fullName, email, password y opcionalmente role (user | host | admin).
  * @returns Promesa con el usuario creado (UserForService).
  */
-export async function createUser(params: { fullName: string; email: string; password: string }) {
+export async function createUser(params: { fullName: string; email: string; password: string; role?: string }) {
   const passwordHash = await hashPassword(params.password)
   return userRepository.create({
     fullName: params.fullName,
     email: params.email.toLowerCase(),
     passwordHash,
+    role: params.role,
   })
 }
 

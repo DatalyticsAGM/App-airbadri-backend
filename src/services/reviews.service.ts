@@ -98,9 +98,15 @@ export async function getReviewByIdOrThrow(id: string) {
 /**
  * Actualiza rating y/o comment de una reseña. Solo el autor puede actualizarla.
  */
-export async function updateReview(userId: string, reviewId: string, patch: Partial<Pick<Review, 'rating' | 'comment'>>) {
+export async function updateReview(
+  userId: string,
+  reviewId: string,
+  patch: Partial<Pick<Review, 'rating' | 'comment'>>,
+  opts?: { isAdmin?: boolean }
+) {
   const current = await getReviewByIdOrThrow(reviewId)
-  if (current.userId !== userId) throw httpError(403, 'FORBIDDEN', 'Not allowed')
+  const isAdmin = Boolean(opts?.isAdmin)
+  if (!isAdmin && current.userId !== userId) throw httpError(403, 'FORBIDDEN', 'Not allowed')
 
   const next: Partial<Pick<Review, 'rating' | 'comment' | 'date'>> = {}
   if (patch.rating !== undefined) {
@@ -127,9 +133,10 @@ export async function updateReview(userId: string, reviewId: string, patch: Part
 /**
  * Elimina una reseña. Solo el autor puede eliminarla.
  */
-export async function deleteReview(userId: string, reviewId: string) {
+export async function deleteReview(userId: string, reviewId: string, opts?: { isAdmin?: boolean }) {
   const current = await getReviewByIdOrThrow(reviewId)
-  if (current.userId !== userId) throw httpError(403, 'FORBIDDEN', 'Not allowed')
+  const isAdmin = Boolean(opts?.isAdmin)
+  if (!isAdmin && current.userId !== userId) throw httpError(403, 'FORBIDDEN', 'Not allowed')
   await reviewRepository.delete(reviewId)
   return true
 }
