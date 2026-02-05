@@ -37,7 +37,7 @@ export async function runSeed(): Promise<SeedResult> {
     role: 'admin',
   })
   const adminId = getUserId(admin)
-  users.push({ email: 'admin@example.com', id: adminId, role: 'admin' })
+  users.push({ email: 'administrador@example.com', id: adminId, role: 'admin' })
 
   const host1 = await createUser({
     fullName: 'Ana Host',

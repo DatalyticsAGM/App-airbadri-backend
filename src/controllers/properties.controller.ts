@@ -125,6 +125,7 @@ export async function listMineHandler(req: Request, res: Response) {
 export async function createPropertyHandler(req: Request, res: Response) {
   const hostId = String((req as any).userId || '')
   if (!hostId) throw httpError(401, 'UNAUTHORIZED', 'Unauthorized')
+  const roleBefore = String((req as any).userRole || 'user')
 
   const title = String(req.body?.title || '')
   const description = String(req.body?.description || '')
@@ -146,10 +147,11 @@ export async function createPropertyHandler(req: Request, res: Response) {
     maxGuests: req.body?.maxGuests,
   })
 
-  // Si se promovió a host, devolver nuevo token para que el cliente actualice (el JWT lleva el rol).
-  const user = await findUserById(hostId)
-  if (user && user.role === 'host') {
-    const accessToken = signAccessToken(hostId, user.role)
+  // Si cambió a host, devolver nuevo token para que el cliente actualice (el JWT lleva el rol).
+  const userAfter = await findUserById(hostId)
+  const roleAfter = userAfter?.role || roleBefore
+  if (roleBefore !== roleAfter && roleAfter === 'host') {
+    const accessToken = signAccessToken(hostId, roleAfter)
     res.status(201).json({ ...property, accessToken })
     return
   }
