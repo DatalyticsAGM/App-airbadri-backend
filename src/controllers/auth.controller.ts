@@ -20,6 +20,7 @@ import {
   verifyPassword,
   findUserByValidResetToken,
 } from '../services/auth.service'
+import { sendPasswordResetEmail } from '../services/email.service'
 
 export async function signup(req: Request, res: Response) {
   const fullName = String(req.body?.fullName || '').trim()
@@ -84,6 +85,13 @@ export async function forgotPassword(req: Request, res: Response) {
   const resetToken = generateResetToken()
   const expiresAt = new Date(Date.now() + 15 * 60 * 1000) // 15 minutos
   await setResetPasswordToken(getUserId(user), resetToken, expiresAt)
+
+  // Intentar enviar email (no falla si Resend tiene restricciones en modo dev)
+  try {
+    await sendPasswordResetEmail(email, resetToken, expiresAt)
+  } catch (err) {
+    console.log('⚠️  Email no enviado (modo dev, usa el token de la respuesta):', err)
+  }
 
   // Modo dev: se devuelve el token para que el frontend lo use (M1 contrato: ok + resetToken).
   res.json({ ok: true, resetToken, expiresAt: expiresAt.toISOString() })

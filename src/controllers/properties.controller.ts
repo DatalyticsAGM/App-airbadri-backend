@@ -183,3 +183,10 @@ export async function deletePropertyHandler(req: Request, res: Response) {
   res.status(204).send()
 }
 
+export async function listPropertiesByHostHandler(req: Request, res: Response) {
+  const hostId = String(req.params?.hostId || '').trim()
+  if (!hostId) throw httpError(400, 'VALIDATION_ERROR', 'hostId is required')
+
+  const result = await listProperties({ hostId })
+  res.json(result)
+}

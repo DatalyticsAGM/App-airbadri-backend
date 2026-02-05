@@ -5,6 +5,7 @@ import {
   cancelMyBooking,
   createBooking,
   getMyBookingByIdOrThrow,
+  listBookingsByProperty,
   listMyBookings,
   normalizeBookingStatus,
 } from '../services/bookings.service'
@@ -71,3 +72,11 @@ export async function patchBookingHandler(req: Request, res: Response) {
   res.json({ ...updated, status: normalizeBookingStatus(updated) })
 }
 
+export async function listBookingsByPropertyHandler(req: Request, res: Response) {
+  const propertyId = String(req.params?.propertyId || '').trim()
+  if (!propertyId) throw httpError(400, 'VALIDATION_ERROR', 'propertyId is required')
+
+  const list = await listBookingsByProperty(propertyId)
+  const items = list.map((b) => ({ ...b, status: normalizeBookingStatus(b) }))
+  res.json({ items })
+}

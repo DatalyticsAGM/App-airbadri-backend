@@ -723,6 +723,31 @@
           }
         },
         {
+          "name": "GET /api/properties/host/:hostId",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200\", function() { pm.response.to.have.status(200); });",
+                  "pm.test(\"Response has items array\", function() {",
+                  "    const j = pm.response.json();",
+                  "    pm.expect(j).to.have.property('items');",
+                  "    pm.expect(j.items).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/properties/host/:hostId",
+            "description": "Lista propiedades de un host específico. Reemplazar :hostId por ID real."
+          }
+        },
+        {
           "name": "POST /api/properties",
           "event": [
             {
@@ -904,6 +929,29 @@
           }
         },
         {
+          "name": "GET /api/bookings/property/:propertyId",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200\", function() { pm.response.to.have.status(200); });",
+                  "pm.test(\"Response has items\", function() {",
+                  "    pm.expect(pm.response.json()).to.have.property('items');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/bookings/property/:propertyId",
+            "description": "Lista reservas de una propiedad específica. Reemplazar :propertyId por ID real."
+          }
+        },
+        {
           "name": "POST /api/bookings",
           "event": [
             {
@@ -978,6 +1026,32 @@
     {
       "name": "Reviews",
       "item": [
+        {
+          "name": "GET /api/reviews/property/:propertyId",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200\", function() { pm.response.to.have.status(200); });",
+                  "pm.test(\"Response has items and averageRating\", function() {",
+                  "    const j = pm.response.json();",
+                  "    pm.expect(j).to.have.property('items');",
+                  "    pm.expect(j).to.have.property('averageRating');",
+                  "    pm.expect(j).to.have.property('total');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/reviews/property/:propertyId",
+            "description": "Lista reviews de una propiedad específica (alias de GET /api/properties/:id/reviews). Reemplazar :propertyId por ID real."
+          }
+        },
         {
           "name": "PATCH /api/reviews/:id",
           "event": [

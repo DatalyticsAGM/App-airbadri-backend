@@ -54,3 +54,10 @@ export async function deleteReviewHandler(req: Request, res: Response) {
   res.json({ ok: true })
 }
 
+export async function listReviewsByPropertyHandler(req: Request, res: Response) {
+  const propertyId = String(req.params?.propertyId || '').trim()
+  if (!propertyId) throw httpError(400, 'VALIDATION_ERROR', 'propertyId is required')
+
+  const result = await listReviewsByProperty(propertyId)
+  res.json(result)
+}

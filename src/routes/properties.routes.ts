@@ -9,6 +9,7 @@ import {
   getBookingPreviewHandler,
   getPropertyHandler,
   listMineHandler,
+  listPropertiesByHostHandler,
   listPropertiesHandler,
   updatePropertyHandler,
 } from '../controllers/properties.controller'
@@ -20,6 +21,7 @@ export function propertiesRoutes() {
   router.get('/', asyncHandler(listPropertiesHandler))
   // Cualquier usuario autenticado puede ver "mis propiedades" (si no tiene, devuelve lista vacía).
   router.get('/mine', requireAuth, asyncHandler(listMineHandler))
+  router.get('/host/:hostId', asyncHandler(listPropertiesByHostHandler))
   router.get('/:id/availability', asyncHandler(getAvailabilityHandler))
   router.get('/:id/booking-preview', asyncHandler(getBookingPreviewHandler))
   router.get('/:id/reviews', asyncHandler(listPropertyReviewsHandler))

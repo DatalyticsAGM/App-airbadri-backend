@@ -10,6 +10,8 @@ exports.env = {
     JWT_SECRET: process.env.JWT_SECRET || '',
     JWT_EXPIRES_IN: process.env.JWT_EXPIRES_IN || '7d',
     FRONTEND_ORIGIN: process.env.FRONTEND_ORIGIN || '',
+    RESEND_API_KEY: process.env.RESEND_API_KEY || '',
+    RESEND_FROM_EMAIL: process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev',
 };
 function assertEnv() {
     if (!exports.env.JWT_SECRET) {

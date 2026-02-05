@@ -10,6 +10,7 @@ exports.resetPasswordWithToken = resetPasswordWithToken;
 const errorHandler_1 = require("../middlewares/errorHandler");
 const validation_1 = require("../utils/validation");
 const auth_service_1 = require("../services/auth.service");
+const email_service_1 = require("../services/email.service");
 async function signup(req, res) {
     const fullName = String(req.body?.fullName || '').trim();
     const email = String(req.body?.email || '').trim().toLowerCase();
@@ -67,6 +68,13 @@ async function forgotPassword(req, res) {
     const resetToken = (0, auth_service_1.generateResetToken)();
     const expiresAt = new Date(Date.now() + 15 * 60 * 1000); // 15 minutos
     await (0, auth_service_1.setResetPasswordToken)((0, auth_service_1.getUserId)(user), resetToken, expiresAt);
+    // Intentar enviar email (no falla si Resend tiene restricciones en modo dev)
+    try {
+        await (0, email_service_1.sendPasswordResetEmail)(email, resetToken, expiresAt);
+    }
+    catch (err) {
+        console.log('⚠️  Email no enviado (modo dev, usa el token de la respuesta):', err);
+    }
     // Modo dev: se devuelve el token para que el frontend lo use (M1 contrato: ok + resetToken).
     res.json({ ok: true, resetToken, expiresAt: expiresAt.toISOString() });
 }

@@ -5,6 +5,8 @@ type Env = {
   JWT_SECRET: string
   JWT_EXPIRES_IN: string
   FRONTEND_ORIGIN: string
+  RESEND_API_KEY: string
+  RESEND_FROM_EMAIL: string
 }
 
 const DEFAULT_PORT = 3333 // mismo que la colección Postman (localhost:3333)
@@ -16,6 +18,8 @@ export const env: Env = {
   JWT_SECRET: process.env.JWT_SECRET || '',
   JWT_EXPIRES_IN: process.env.JWT_EXPIRES_IN || '7d',
   FRONTEND_ORIGIN: process.env.FRONTEND_ORIGIN || '',
+  RESEND_API_KEY: process.env.RESEND_API_KEY || '',
+  RESEND_FROM_EMAIL: process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev',
 }
 
 export function assertEnv() {
