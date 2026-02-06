@@ -13,19 +13,17 @@ COPY package*.json ./
 # Instala todas las dependencias (incluidas devDependencies para compilar TypeScript)
 RUN npm ci
 
-# Arregla permisos de binarios de node_modules (necesario en algunos VPS)
-RUN chmod -R +x node_modules/.bin 2>/dev/null || true
-
 # Copia el código fuente
 COPY . .
 
-# Asegura permisos correctos para todos los archivos
-RUN chown -R node:node /app
+# Arregla permisos DESPUÉS de copiar todo (necesario en VPS)
+RUN chmod -R 755 /app && \
+    chmod -R +x /app/node_modules/.bin 2>/dev/null || true
 
-# Compila TypeScript a JavaScript (usando npx para asegurar ejecución)
-RUN npx tsc -p tsconfig.json
+# Compila TypeScript a JavaScript
+RUN npm run build
 
-# Elimina devDependencies para reducir tamaño de imagen (opcional)
+# Elimina devDependencies para reducir tamaño de imagen
 RUN npm prune --production
 
 # Variables de entorno por defecto (⚠️ SOLO PARA DESARROLLO)
