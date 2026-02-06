@@ -1,3 +1,4 @@
+# Dockerfile para PRODUCCIÓN (sin secretos hardcodeados)
 # Usa Node.js 22.22 con npm 10.9
 FROM node:22.22-alpine
 
@@ -25,22 +26,14 @@ RUN chown -R node:node /app
 # Compila TypeScript a JavaScript (usando npx para asegurar ejecución)
 RUN npx tsc -p tsconfig.json
 
-# Elimina devDependencies para reducir tamaño de imagen (opcional)
+# Elimina devDependencies para reducir tamaño de imagen
 RUN npm prune --production
 
-# Variables de entorno por defecto (⚠️ SOLO PARA DESARROLLO)
-# Para producción, SIEMPRE pasar variables con docker run -e o docker-compose
+# Variables de entorno por defecto (valores genéricos, SOBREESCRIBIR en producción)
 ENV NODE_ENV=production \
-    PORT=3333 \
-    JWT_SECRET=dev_secret_change_in_production_12345678 \
-    JWT_EXPIRES_IN=7d \
-    MONGO_URI=mongodb+srv://adriangallardogm_db_user:Adryan1998@adribnb.as0xziy.mongodb.net/bbddadri?appName=Adribnb \
-    DNS_SERVERS=1.1.1.1,8.8.8.8 \
-    FRONTEND_ORIGIN=http://localhost:3000 \
-    RESEND_API_KEY=re_EBC2buMx_81x53QpPRczzcLfcVpeWfQEk \
-    RESEND_FROM_EMAIL=onboarding@resend.dev
+    PORT=3333
 
-# Expone el puerto (ajusta según tu .env)
+# Expone el puerto
 EXPOSE 3333
 
 # Usuario no-root para seguridad
